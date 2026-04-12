@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWEHub - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .background {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 10%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 90%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0a15 0%, #0f0f1e 50%, #1a1a2e 100%);
+            z-index: 0;
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(0deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(90deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px);
+            opacity: 0.3;
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(102, 126, 234, 0.4) 50%, transparent 100%);
+            border-radius: 50%;
+            animation: float linear infinite;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-20vh) translateX(var(--drift)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            animation: orbMove 30s ease-in-out infinite;
+            mix-blend-mode: screen;
+        }
+
+        .orb-1 {
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.6) 0%, transparent 70%);
+            top: -20%;
+            left: -20%;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.5) 0%, transparent 70%);
+            bottom: -20%;
+            right: -15%;
+            animation-delay: -15s;
+        }
+
+        .orb-3 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.4) 0%, transparent 70%);
+            top: 40%;
+            right: -15%;
+            animation-delay: -25s;
+        }
+
+        @keyframes orbMove {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1) rotate(0deg); 
+            }
+            25% { 
+                transform: translate(100px, -80px) scale(1.2) rotate(90deg); 
+            }
+            50% { 
+                transform: translate(-50px, 60px) scale(0.8) rotate(180deg); 
+            }
+            75% { 
+                transform: translate(80px, 40px) scale(1.1) rotate(270deg); 
+            }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.08;
+            animation: float-shape linear infinite;
+        }
+
+        .shape-circle {
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+        }
+
+        .shape-square {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.4), rgba(102, 126, 234, 0.4));
+            transform: rotate(45deg);
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 35px solid transparent;
+            border-right: 35px solid transparent;
+            border-bottom: 60px solid rgba(118, 75, 162, 0.4);
+        }
+
+        @keyframes float-shape {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.12;
+            }
+            90% {
+                opacity: 0.12;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .top-nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 60px;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeSlideDown 1s ease both;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .skip-btn {
+            padding: 12px 32px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 100px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeSlideDown 1s ease 0.2s both;
+        }
+
+        .skip-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 60px 200px;
+            position: relative;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            font-size: 24px;
+            color: white;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.left {
+            left: 60px;
+        }
+
+        .nav-arrow.right {
+            right: 60px;
+        }
+
+        .slides-container {
+            width: 100%;
+            max-width: 1000px;
+            position: relative;
+            height: 450px;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.92) translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+
+        .slide-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+        }
+
+        .slide-icon {
+            font-size: 100px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+            animation: floatIcon 5s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+
+        .slide-title {
+            font-size: 64px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 28px;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .slide-title .highlight {
+            background: linear-gradient(135deg, #667eea, #764ba2, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-description {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.65);
+            max-width: 700px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 50px 60px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .progress-container {
+            display: flex;
+            gap: 12px;
+            animation: fadeSlideUp 1s ease 0.4s both;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-dot.active {
+            background: white;
+            width: 48px;
+            box-shadow: 0 0 24px rgba(255, 255, 255, 0.6);
+        }
+
+        .progress-dot:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.3);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            animation: fadeSlideUp 1s ease 0.6s both;
+        }
+
+        .cta-btn {
+            padding: 18px 42px;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .cta-btn:hover::before {
+            opacity: 1;
+        }
+
+        .cta-btn.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .cta-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        @keyframes fadeSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-nav, .bottom-nav {
+                padding: 30px;
+            }
+
+            .content-wrapper {
+                padding: 100px 30px 180px;
+            }
+
+            .slide-title {
+                font-size: 42px;
+            }
+
+            .slide-description {
+                font-size: 17px;
+            }
+
+            .slide-icon {
+                font-size: 70px;
+                margin-bottom: 28px;
+            }
+
+            .nav-arrow {
+                display: none;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .cta-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="particles" id="particles"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+
+    <div class="container">
+        <div class="top-nav">
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">SWE<span>Hub</span></div>
+            </div>
+            <button class="skip-btn" onclick="goToAuth()">Skip Intro</button>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="nav-arrow left" onclick="prevSlide()">‹</div>
+            
+            <div class="slides-container">
+                <div class="slide active">
+                    
+                    <div class="slide-icon">🎓</div>
+                    <h1 class="slide-title">Welcome to <span class="highlight">SWEHub</span></h1>
+                    <p class="slide-description">Your premium academic management platform designed for excellence in Software Engineering education</p>
+                </div>
+
+                <div class="slide">
+                   
+                    <div class="slide-icon">📋</div>
+                    <h1 class="slide-title">Smart <span class="highlight">Assignment</span> System</h1>
+                    <p class="slide-description">Seamlessly submit, collaborate, and track academic progress with intelligent project management tools</p>
+                </div>
+
+                <div class="slide">
+                   
+                    <div class="slide-icon">📚</div>
+                    <h1 class="slide-title">Centralized <span class="highlight">Resources</span></h1>
+                    <p class="slide-description">Access comprehensive study materials, lecture notes, and course content from anywhere, anytime</p>
+                </div>
+
+                <div class="slide">
+                   
+                    <div class="slide-icon">🚀</div>
+                    <h1 class="slide-title">Stay <span class="highlight">Organized</span></h1>
+                    <p class="slide-description">Live schedules, instant updates, and comprehensive overviews—everything you need at your fingertips</p>
+                </div>
+            </div>
+
+            <div class="nav-arrow right" onclick="nextSlide()">›</div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="progress-container">
+                <div class="progress-dot active" onclick="goToSlide(0)"></div>
+                <div class="progress-dot" onclick="goToSlide(1)"></div>
+                <div class="progress-dot" onclick="goToSlide(2)"></div>
+                <div class="progress-dot" onclick="goToSlide(3)"></div>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="login.html" class="cta-btn secondary">Sign In</a>
+                <a href="signup.html" class="cta-btn primary">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating shapes
+        function createFloatingShapes() {
+            const container = document.getElementById('floatingShapes');
+            const shapes = ['circle', 'square', 'triangle'];
+            const shapeCount = 20;
+
+            for (let i = 0; i < shapeCount; i++) {
+                const shape = document.createElement('div');
+                const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+                
+                shape.className = `shape shape-${shapeType}`;
+                
+                const size = Math.random() * 50 + 25;
+                if (shapeType !== 'triangle') {
+                    shape.style.width = size + 'px';
+                    shape.style.height = size + 'px';
+                }
+                
+                shape.style.left = Math.random() * 100 + '%';
+                shape.style.animationDuration = (Math.random() * 20 + 25) + 's';
+                shape.style.animationDelay = Math.random() * 15 + 's';
+                
+                container.appendChild(shape);
+            }
+        }
+
+        createFloatingShapes();
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 40;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 3 + 1;
+                const drift = (Math.random() - 0.5) * 200;
+                
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.setProperty('--drift', drift + 'px');
+                particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.progress-dot');
+        const totalSlides = slides.length;
+
+        function updateSlides() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlides();
+            resetAutoSlide();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlides();
+            resetAutoSlide();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlides();
+            resetAutoSlide();
+        }
+
+        let autoSlideInterval = setInterval(nextSlide, 5000);
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50;
+            
+            if (touchEndX < touchStartX - swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                prevSlide();
+            }
+        }, { passive: true });
+
+        function goToAuth() {
+            window.location.href = 'signup.html';
+        }
+    </script>
+</body>
+</html>

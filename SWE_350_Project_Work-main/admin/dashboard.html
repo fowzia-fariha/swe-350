@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWEHub - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --secondary-gradient: linear-gradient(135deg, #764ba2, #f093fb);
+            --success-gradient: linear-gradient(135deg, #10b981, #34d399);
+            --warning-gradient: linear-gradient(135deg, #f59e0b, #fbbf24);
+            --danger-gradient: linear-gradient(135deg, #ef4444, #f87171);
+            --info-gradient: linear-gradient(135deg, #3b82f6, #60a5fa);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            --bg-dark: #0f0f1e;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .background {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 10% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a15 0%, #0f0f1e 50%, #1a1a2e 100%);
+            z-index: -2;
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(0deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(90deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px);
+            opacity: 0.3;
+        }
+
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: orbFloat 25s ease-in-out infinite;
+            mix-blend-mode: screen;
+            z-index: -1;
+        }
+
+        .orb-1 {
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.5) 0%, transparent 70%);
+            top: -30%;
+            left: -20%;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.4) 0%, transparent 70%);
+            bottom: -20%;
+            right: -15%;
+            animation-delay: -12s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1) rotate(0deg); 
+            }
+            25% { 
+                transform: translate(5%, -5%) scale(1.2) rotate(90deg); 
+            }
+            50% { 
+                transform: translate(-5%, 5%) scale(0.9) rotate(180deg); 
+            }
+            75% { 
+                transform: translate(3%, -3%) scale(1.1) rotate(270deg); 
+            }
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo-container {
+            padding: 0 30px 40px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo-text h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar-footer {
+            padding: 30px 30px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--danger-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-btn:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: white;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        /* Dashboard Stats */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+            color: var(--info);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            color: var(--success);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+            color: var(--warning);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+            color: var(--purple);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Main Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* System Overview */
+        .system-overview {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .view-all {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-inactive {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: white;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Quick Actions */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .quick-action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-action-card:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .quick-action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .quick-action-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .quick-action-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .activity-icon.user {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .activity-icon.result {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .activity-icon.system {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .activity-icon.security {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* System Alerts */
+        .system-alerts {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 15px;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .alert-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload i {
+            font-size: 48px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .file-upload p {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .file-upload span {
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: white;
+        }
+
+        .tab-btn.active {
+            color: white;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 80px 20px 20px;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .top-bar-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title h1 {
+                font-size: 28px;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="background"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="logo-icon">⚙️</div>
+                    <div class="logo-text">
+                        <h2>SWE<span>Hub</span></h2>
+                        <p>Admin Dashboard</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Student Records</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Faculty Management</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Results & Grades</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>Course Catalog</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Academic Calendar</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    <span>System Settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Security & Logs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-file-export"></i>
+                    <span>Reports & Export</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <h4>Admin Officer</h4>
+                        <p>System Administrator</p>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Admin Dashboard</h1>
+                    <p>System administration and management portal</p>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="notification-btn" onclick="toggleNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search users, courses, records...">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Stats -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">1,248</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-value">48</div>
+                    <div class="stat-label">Faculty Members</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-value">32</div>
+                    <div class="stat-label">Active Courses</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+            </div>
+            
+            <!-- Main Content Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- System Overview -->
+                    <section class="system-overview">
+                        <div class="section-header">
+                            <h2>System Overview</h2>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="openSystemReportModal()">
+                                    <i class="fas fa-file-export"></i>
+                                    Generate Report
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab Navigation -->
+                        <div class="tab-nav">
+                            <button class="tab-btn active" onclick="switchTab('users')">User Management</button>
+                            <button class="tab-btn" onclick="switchTab('results')">Results</button>
+                            <button class="tab-btn" onclick="switchTab('courses')">Courses</button>
+                            <button class="tab-btn" onclick="switchTab('requests')">Pending Requests</button>
+                        </div>
+                        
+                        <!-- Users Tab -->
+                        <div class="tab-content active" id="usersTab">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ST2023001</td>
+                                        <td>John Smith</td>
+                                        <td>Student</td>
+                                        <td>Computer Science</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editUser('ST2023001')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewUserDetails('ST2023001')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="resetPassword('ST2023001')">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>TC2022005</td>
+                                        <td>Dr. Sarah Johnson</td>
+                                        <td>Teacher</td>
+                                        <td>Software Engineering</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editUser('TC2022005')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewUserDetails('TC2022005')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="resetPassword('TC2022005')">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST2023015</td>
+                                        <td>Michael Brown</td>
+                                        <td>Student</td>
+                                        <td>Information Technology</td>
+                                        <td><span class="status-badge status-inactive">Inactive</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editUser('ST2023015')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewUserDetails('ST2023015')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="activateUser('ST2023015')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>TC2021003</td>
+                                        <td>Prof. Robert Chen</td>
+                                        <td>Teacher</td>
+                                        <td>Computer Networks</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editUser('TC2021003')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewUserDetails('TC2021003')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="resetPassword('TC2021003')">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST2023020</td>
+                                        <td>Emily Davis</td>
+                                        <td>Student</td>
+                                        <td>Cyber Security</td>
+                                        <td><span class="status-badge status-pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editUser('ST2023020')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewUserDetails('ST2023020')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="approveUser('ST2023020')">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-actions-grid">
+                                <div class="quick-action-card" onclick="openAddUserModal()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Add New User</h4>
+                                        <p>Create student/teacher accounts</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openBulkUploadModal()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-file-upload"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Bulk Upload</h4>
+                                        <p>Import users from CSV/Excel</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openRoleManagement()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-user-tag"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Role Management</h4>
+                                        <p>Manage user roles & permissions</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openDepartmentManagement()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Departments</h4>
+                                        <p>Manage academic departments</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Tab -->
+                        <div class="tab-content" id="resultsTab">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Grade</th>
+                                        <th>GPA</th>
+                                        <th>Semester</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ST2023001</td>
+                                        <td>John Smith</td>
+                                        <td>CS301 - Software Engineering</td>
+                                        <td>A</td>
+                                        <td>3.8</td>
+                                        <td>Spring 2024</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editResult('ST2023001', 'CS301')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewTranscript('ST2023001')">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="downloadResult('ST2023001', 'CS301')">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST2023015</td>
+                                        <td>Michael Brown</td>
+                                        <td>CS302 - Database Systems</td>
+                                        <td>B+</td>
+                                        <td>3.2</td>
+                                        <td>Spring 2024</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editResult('ST2023015', 'CS302')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewTranscript('ST2023015')">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="downloadResult('ST2023015', 'CS302')">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ST2023020</td>
+                                        <td>Emily Davis</td>
+                                        <td>CS401 - Computer Networks</td>
+                                        <td>A-</td>
+                                        <td>3.6</td>
+                                        <td>Spring 2024</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editResult('ST2023020', 'CS401')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewTranscript('ST2023020')">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="downloadResult('ST2023020', 'CS401')">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-actions-grid">
+                                <div class="quick-action-card" onclick="openBulkResultUpload()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-table"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Bulk Result Upload</h4>
+                                        <p>Upload results for multiple students</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openGradeScaleManagement()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-sliders-h"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Grade Scales</h4>
+                                        <p>Manage grading scales & policies</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openTranscriptGeneration()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-file-certificate"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Generate Transcripts</h4>
+                                        <p>Create official transcripts</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-action-card" onclick="openResultAnalysis()">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div class="quick-action-content">
+                                        <h4>Result Analysis</h4>
+                                        <p>View statistics & analytics</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Courses Tab -->
+                        <div class="tab-content" id="coursesTab">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Course Name</th>
+                                        <th>Department</th>
+                                        <th>Credits</th>
+                                        <th>Instructor</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>CS301</td>
+                                        <td>Software Engineering</td>
+                                        <td>Computer Science</td>
+                                        <td>3</td>
+                                        <td>Dr. Sarah Johnson</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editCourse('CS301')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewCourseSyllabus('CS301')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="manageCourseStudents('CS301')">
+                                                    <i class="fas fa-users"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>CS302</td>
+                                        <td>Database Systems</td>
+                                        <td>Computer Science</td>
+                                        <td>4</td>
+                                        <td>Prof. Robert Chen</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editCourse('CS302')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewCourseSyllabus('CS302')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="manageCourseStudents('CS302')">
+                                                    <i class="fas fa-users"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>CS401</td>
+                                        <td>Computer Networks</td>
+                                        <td>Computer Science</td>
+                                        <td>3</td>
+                                        <td>Prof. James Wilson</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="editCourse('CS401')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="viewCourseSyllabus('CS401')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="manageCourseStudents('CS401')">
+                                                    <i class="fas fa-users"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Requests Tab -->
+                        <div class="tab-content" id="requestsTab">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Type</th>
+                                        <th>Requester</th>
+                                        <th>Date</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>REQ001245</td>
+                                        <td>Grade Change</td>
+                                        <td>John Smith (ST2023001)</td>
+                                        <td>Mar 10, 2024</td>
+                                        <td><span style="color: var(--warning);">Medium</span></td>
+                                        <td><span class="status-badge status-pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="reviewRequest('REQ001245')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="approveRequest('REQ001245')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="rejectRequest('REQ001245')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>REQ001244</td>
+                                        <td>Course Registration</td>
+                                        <td>Emily Davis (ST2023020)</td>
+                                        <td>Mar 9, 2024</td>
+                                        <td><span style="color: var(--success);">Low</span></td>
+                                        <td><span class="status-badge status-pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="reviewRequest('REQ001244')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="approveRequest('REQ001244')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="rejectRequest('REQ001244')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>REQ001243</td>
+                                        <td>Transcript Request</td>
+                                        <td>Michael Brown (ST2023015)</td>
+                                        <td>Mar 8, 2024</td>
+                                        <td><span style="color: var(--danger);">High</span></td>
+                                        <td><span class="status-badge status-pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn" onclick="reviewRequest('REQ001243')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="approveRequest('REQ001243')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="action-btn" onclick="rejectRequest('REQ001243')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Right Sidebar -->
+                <div class="right-sidebar">
+                    <!-- Recent Activity -->
+                    <section class="recent-activity">
+                        <div class="section-header">
+                            <h2>Recent Activity</h2>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon user">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">New student account created</div>
+                                <div class="activity-time">10 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon result">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Grade change request processed</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon system">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">System backup completed</div>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon security">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Security audit conducted</div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- System Alerts -->
+                    <section class="system-alerts">
+                        <div class="section-header">
+                            <h2>System Alerts</h2>
+                        </div>
+                        
+                        <div class="alert-item">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Database Maintenance</div>
+                                <div class="alert-message">Scheduled for March 15, 2:00 AM - 4:00 AM</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item">
+                            <div class="alert-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Storage Usage</div>
+                                <div class="alert-message">85% of storage capacity used</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item">
+                            <div class="alert-icon">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">Pending Approvals</div>
+                                <div class="alert-message">156 requests awaiting action</div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Quick Admin Actions -->
+                    <section class="system-overview">
+                        <div class="section-header">
+                            <h2>Quick Actions</h2>
+                        </div>
+                        
+                        <div class="quick-actions-grid">
+                            <div class="quick-action-card" onclick="openSystemSettings()">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h4>System Settings</h4>
+                                    <p>Configure system parameters</p>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-action-card" onclick="openBackupRestore()">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h4>Backup & Restore</h4>
+                                    <p>Manage system backups</p>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-action-card" onclick="openAuditLogs()">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h4>Audit Logs</h4>
+                                    <p>View system activity logs</p>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-action-card" onclick="openAnnouncementSystem()">
+                                <div class="quick-action-icon">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h4>Announcements</h4>
+                                    <p>Send system-wide messages</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Add User Modal -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New User</h3>
+                <button class="close-modal" onclick="closeAddUserModal()">&times;</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>User Type</label>
+                        <select required>
+                            <option value="">Select Type</option>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select required>
+                            <option value="">Select Department</option>
+                            <option value="cs">Computer Science</option>
+                            <option value="it">Information Technology</option>
+                            <option value="se">Software Engineering</option>
+                            <option value="cyber">Cyber Security</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" placeholder="Enter first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" placeholder="Enter last name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="Enter email address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="Enter phone number">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Initial Password</label>
+                    <input type="password" placeholder="Enter initial password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Additional Information</label>
+                    <textarea placeholder="Enter any additional notes or information"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit Result Modal -->
+    <div class="modal" id="editResultModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Student Result</h3>
+                <button class="close-modal" onclick="closeEditResultModal()">&times;</button>
+            </div>
+            <form id="editResultForm">
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" id="editStudentId" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="editStudentName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Course</label>
+                    <input type="text" id="editCourseName" readonly>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marks Obtained</label>
+                        <input type="number" id="editMarks" placeholder="Enter marks" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Marks</label>
+                        <input type="number" id="editTotalMarks" placeholder="Enter total marks" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Grade</label>
+                    <select id="editGrade" required>
+                        <option value="">Select Grade</option>
+                        <option value="A">A (90-100%)</option>
+                        <option value="A-">A- (85-89%)</option>
+                        <option value="B+">B+ (80-84%)</option>
+                        <option value="B">B (75-79%)</option>
+                        <option value="B-">B- (70-74%)</option>
+                        <option value="C+">C+ (65-69%)</option>
+                        <option value="C">C (60-64%)</option>
+                        <option value="D">D (50-59%)</option>
+                        <option value="F">F (Below 50%)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea id="editRemarks" placeholder="Enter any remarks"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Change Reason</label>
+                    <textarea id="editChangeReason" placeholder="Explain reason for grade change" required></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditResultModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Result</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (event) => {
+            if (window.innerWidth <= 992) {
+                if (!sidebar.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        // Tab Switching Functionality
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to selected tab
+            document.querySelector(`.tab-btn[onclick*="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+        
+        // Modal Functions
+        function openAddUserModal() {
+            document.getElementById('addUserModal').classList.add('active');
+        }
+        
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('active');
+            document.getElementById('addUserForm').reset();
+        }
+        
+        function openEditResultModal(studentId, studentName, course) {
+            const modal = document.getElementById('editResultModal');
+            document.getElementById('editStudentId').value = studentId;
+            document.getElementById('editStudentName').value = studentName;
+            document.getElementById('editCourseName').value = course;
+            modal.classList.add('active');
+        }
+        
+        function closeEditResultModal() {
+            document.getElementById('editResultModal').classList.remove('active');
+            document.getElementById('editResultForm').reset();
+        }
+        
+        // User Management Functions
+        function editUser(userId) {
+            alert(`Opening edit interface for user: ${userId}\n\nEdit Options:\n- Personal information\n- Contact details\n- Department assignment\n- Status activation/deactivation\n- Role permissions`);
+        }
+        
+        function viewUserDetails(userId) {
+            alert(`Viewing details for user: ${userId}\n\nUser Details:\n- Complete profile information\n- Academic records\n- Activity history\n- Login history\n- Associated courses\n- Contact information`);
+        }
+        
+        function resetPassword(userId) {
+            if (confirm(`Reset password for user: ${userId}?\n\nA temporary password will be generated and sent to the user's email.`)) {
+                alert(`Password reset initiated for ${userId}\nTemporary password sent to user's email.`);
+            }
+        }
+        
+        function activateUser(userId) {
+            if (confirm(`Activate user account: ${userId}?`)) {
+                alert(`User ${userId} activated successfully.\nUser can now access the system.`);
+            }
+        }
+        
+        function approveUser(userId) {
+            if (confirm(`Approve pending user: ${userId}?`)) {
+                alert(`User ${userId} approved successfully.\nAccount has been activated.`);
+            }
+        }
+        
+        // Result Management Functions
+        function editResult(studentId, courseCode) {
+            openEditResultModal(studentId, "Student Name", courseCode);
+        }
+        
+        function viewTranscript(studentId) {
+            alert(`Opening transcript for: ${studentId}\n\nTranscript Features:\n- Complete academic history\n- GPA calculation\n- Course credits\n- Grades by semester\n- Print/export options\n- Official stamp option`);
+        }
+        
+        function downloadResult(studentId, courseCode) {
+            alert(`Downloading result for ${studentId} - ${courseCode}\n\nAvailable formats:\n- PDF Report\n- Excel Sheet\n- CSV Data\n- Print Preview`);
+        }
+        
+        // Course Management Functions
+        function editCourse(courseCode) {
+            alert(`Editing course: ${courseCode}\n\nEdit Options:\n- Course details\n- Syllabus\n- Credit hours\n- Prerequisites\n- Schedule\n- Instructor assignment`);
+        }
+        
+        function viewCourseSyllabus(courseCode) {
+            alert(`Viewing syllabus for: ${courseCode}\n\nSyllabus Details:\n- Course objectives\n- Weekly schedule\n- Reading materials\n- Assessment methods\n- Grading policy\n- Required textbooks`);
+        }
+        
+        function manageCourseStudents(courseCode) {
+            alert(`Managing students for: ${courseCode}\n\nStudent Management:\n- View enrolled students\n- Add/remove students\n- Enrollment capacity\n- Waitlist management\n- Student performance overview`);
+        }
+        
+        // Request Management Functions
+        function reviewRequest(requestId) {
+            alert(`Reviewing request: ${requestId}\n\nRequest Details:\n- Complete request information\n- Supporting documents\n- Requester history\n- Previous similar requests\n- Decision recommendations`);
+        }
+        
+        function approveRequest(requestId) {
+            if (confirm(`Approve request: ${requestId}?`)) {
+                alert(`Request ${requestId} approved successfully.\nRequester will be notified automatically.`);
+            }
+        }
+        
+        function rejectRequest(requestId) {
+            const reason = prompt(`Enter rejection reason for request: ${requestId}`);
+            if (reason) {
+                alert(`Request ${requestId} rejected.\nReason: ${reason}\nRequester will be notified.`);
+            }
+        }
+        
+        // Quick Action Functions
+        function openBulkUploadModal() {
+            alert('Opening Bulk Upload Modal:\n\nFeatures:\n- CSV/Excel template download\n- Data validation rules\n- Preview before import\n- Error reporting\n- Duplicate handling\n- Batch processing');
+        }
+        
+        function openRoleManagement() {
+            alert('Opening Role Management:\n\nFeatures:\n- Create/Edit roles\n- Permission matrix\n- Role assignment\n- Access control lists\n- Audit trail for role changes');
+        }
+        
+        function openDepartmentManagement() {
+            alert('Opening Department Management:\n\nFeatures:\n- Department hierarchy\n- Faculty assignment\n- Course allocation\n- Budget management\n- Department heads\n- Reporting structure');
+        }
+        
+        function openBulkResultUpload() {
+            alert('Opening Bulk Result Upload:\n\nFeatures:\n- Template generation\n- Data validation\n- Grade calculation\n- Error highlighting\n- Preview before submission\n- Notification to students');
+        }
+        
+        function openGradeScaleManagement() {
+            alert('Opening Grade Scale Management:\n\nFeatures:\n- Custom grade scales\n- Percentage ranges\n- GPA calculation\n- Pass/fail criteria\n- Honor roll thresholds\n- Academic standing rules');
+        }
+        
+        function openTranscriptGeneration() {
+            alert('Opening Transcript Generation:\n\nFeatures:\n- Student selection\n- Format customization\n- Official stamps\n- Digital signatures\n- Batch generation\n- Email delivery');
+        }
+        
+        function openResultAnalysis() {
+            alert('Opening Result Analysis:\n\nFeatures:\n- Statistical reports\n- Grade distribution\n- Department comparison\n- Year-over-year trends\n- Student performance analytics\n- Predictive analysis');
+        }
+        
+        function openSystemSettings() {
+            alert('Opening System Settings:\n\nConfiguration Areas:\n- Academic calendar\n- Grading policies\n- Attendance rules\n- Notification settings\n- System preferences\n- Integration settings');
+        }
+        
+        function openBackupRestore() {
+            alert('Opening Backup & Restore:\n\nFeatures:\n- Automated backup schedules\n- Manual backup triggers\n- Restore from backup\n- Backup verification\n- Storage management\n- Disaster recovery');
+        }
+        
+        function openAuditLogs() {
+            alert('Opening Audit Logs:\n\nLog Categories:\n- User activities\n- System changes\n- Security events\n- Data modifications\n- Access attempts\n- Error logs');
+        }
+        
+        function openAnnouncementSystem() {
+            alert('Opening Announcement System:\n\nFeatures:\n- Target audience selection\n- Rich text editor\n- Scheduling\n- Priority levels\n- Attachment support\n- Delivery tracking');
+        }
+        
+        function openSystemReportModal() {
+            alert('Opening System Report Generator:\n\nReport Types:\n- User statistics\n- Academic performance\n- System usage\n- Financial reports\n- Compliance reports\n- Custom reports');
+        }
+        
+        // Form Submission Handlers
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('User created successfully!\n\nAccount details have been sent to the user\'s email.\nUser can now login with the provided credentials.');
+            closeAddUserModal();
+        });
+        
+        document.getElementById('editResultForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('editStudentId').value;
+            const reason = document.getElementById('editChangeReason').value;
+            alert(`Result updated for ${studentId}!\n\nChange Reason: ${reason}\n\nAn audit log has been created for this change.\nStudent will be notified of the grade update.`);
+            closeEditResultModal();
+        });
+        
+        // Notification Toggle
+        function toggleNotifications() {
+            alert('Showing Notifications:\n\n1. System Maintenance (High Priority)\n2. New User Registration Approval (5 pending)\n3. Storage Limit Warning (85% used)\n4. Security Alert: Multiple failed logins\n5. Backup Completed Successfully\n6. Grade Change Requests (3 pending)');
+        }
+        
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?\n\nAll unsaved changes will be lost.')) {
+                window.location.href = '../login.html';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date in page title
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('en-US', options);
+            document.querySelector('.page-title p').textContent = `System administration and management portal - ${dateString}`;
+            
+            // Auto-refresh system stats every 30 seconds
+            setInterval(() => {
+                console.log('Refreshing system statistics...');
+            }, 30000);
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

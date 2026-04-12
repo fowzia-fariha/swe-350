@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWEHub - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f1e;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 10%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 90%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a15 0%, #0f0f1e 50%, #1a1a2e 100%);
+            z-index: -1;
+        }
+
+        .background::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(0deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(90deg, transparent 0px, rgba(255, 255, 255, 0.01) 1px, transparent 2px, transparent 40px);
+            opacity: 0.3;
+        }
+
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.2;
+            animation: orbFloat 25s ease-in-out infinite;
+            mix-blend-mode: screen;
+        }
+
+        .orb-1 {
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.5) 0%, transparent 70%);
+            top: -20%;
+            left: -15%;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.4) 0%, transparent 70%);
+            bottom: -20%;
+            right: -15%;
+            animation-delay: -12s;
+        }
+
+        .orb-3 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.3) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            animation-delay: -20s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+            }
+            25% { 
+                transform: translate(-40%, -60%) scale(1.2) rotate(90deg); 
+            }
+            50% { 
+                transform: translate(-60%, -40%) scale(0.9) rotate(180deg); 
+            }
+            75% { 
+                transform: translate(-55%, -55%) scale(1.1) rotate(270deg); 
+            }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float-shape linear infinite;
+        }
+
+        .shape-circle {
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+        }
+
+        .shape-square {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.3), rgba(102, 126, 234, 0.3));
+            transform: rotate(45deg);
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 52px solid rgba(118, 75, 162, 0.3);
+        }
+
+        @keyframes float-shape {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 12px 24px;
+            border-radius: 100px;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateX(-3px);
+        }
+
+        .role-selection {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .role-selection.hidden {
+            display: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .header span {
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .role-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .role-card:hover::before {
+            left: 100%;
+        }
+
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .role-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .role-card h3 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .role-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .signup-form {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .signup-form.active {
+            display: block;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 44px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .form-header h2 {
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: -0.2px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='rgba(255,255,255,0.6)' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 12px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-footer a {
+            color: white;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 14px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            border-color: rgba(102, 126, 234, 0.6);
+            background: rgba(102, 126, 234, 0.15);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-label:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .cr-fields {
+            display: none;
+            animation: slideDown 0.4s ease;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+        }
+
+        .cr-fields.active {
+            display: block;
+        }
+
+        .cr-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 540px) {
+            .back-btn {
+                top: 20px;
+                left: 20px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .form-container {
+                padding: 36px 28px;
+            }
+
+            .header h1 {
+                font-size: 30px;
+            }
+
+            .logo-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="floating-shapes" id="floatingShapes"></div>
+    
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+
+    <a href="onboarding.html" class="back-btn">
+        <span>←</span> Back
+    </a>
+
+    <div class="container">
+        <div class="role-selection" id="roleSelection">
+            <div class="header">
+                <div class="logo-icon">🎓</div>
+                <h1>SWE<span>Hub</span></h1>
+                <p>Choose your role to get started</p>
+            </div>
+
+            <div class="role-cards">
+                <div class="role-card" onclick="showSignupForm('student')">
+                    <span class="role-icon">🎓</span>
+                    <h3>Student</h3>
+                    <p>Access assignments, study materials, and track your academic progress</p>
+                </div>
+
+                <div class="role-card" onclick="showSignupForm('teacher')">
+                    <span class="role-icon">👨‍🏫</span>
+                    <h3>Teacher</h3>
+                    <p>Create assignments, manage courses, and evaluate student performance</p>
+                </div>
+
+                <div class="role-card" onclick="showSignupForm('admin')">
+                    <span class="role-icon">⚙️</span>
+                    <h3>Admin Officer</h3>
+                    <p>Manage results, courses, and oversee all system operations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="signup-form" id="studentForm">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Student Registration</h2>
+                    <p>Create your student account</p>
+                </div>
+
+                <form onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Registration Number</label>
+                        <input type="text" placeholder="e.g., 2021000000000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Session</label>
+                        <select required>
+                            <option value="">Select Session</option>
+                            <option value="2021-22">2021-22</option>
+                            <option value="2022-23">2022-23</option>
+                            <option value="2023-24">2023-24</option>
+                            <option value="2024-25">2024-25</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Are you a Class Representative (CR)?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="notCR" name="crStatus" value="no" checked onchange="toggleCRFields(false)">
+                                <label for="notCR" class="radio-label">No, I'm a Regular Student</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="isCR" name="crStatus" value="yes" onchange="toggleCRFields(true)">
+                                <label for="isCR" class="radio-label">Yes, I'm a CR</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cr-fields" id="crFields">
+                        <div class="cr-badge">
+                            <span>👑</span> Class Representative Access
+                        </div>
+                        <div class="form-group">
+                            <label>CR Verification Code</label>
+                            <input type="text" placeholder="Enter CR verification code" id="crCode">
+                        </div>
+                        <div class="form-group">
+                            <label>Section/Class</label>
+                            <select id="crSection">
+                                <option value="">Select your section</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="C">Section C</option>
+                                <option value="D">Section D</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Additional Responsibilities</label>
+                            <input type="text" placeholder="e.g., Academic, Cultural, Sports" id="crResponsibilities">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="student@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" placeholder="Re-enter your password" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="signup-form" id="teacherForm">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Teacher Registration</h2>
+                    <p>Create your faculty account</p>
+                </div>
+
+                <form onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teacher ID</label>
+                        <input type="text" placeholder="Enter your teacher ID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select required>
+                            <option value="">Select Department</option>
+                            <option value="swe">Software Engineering</option>
+                            <option value="cse">Computer Science</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="teacher@university.edu" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="+880 1XXX-XXXXXX" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" placeholder="Re-enter your password" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="signup-form" id="adminForm">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Admin Registration</h2>
+                    <p>Create your admin account</p>
+                </div>
+
+                <form onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admin ID</label>
+                        <input type="text" placeholder="Enter your admin ID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select required>
+                            <option value="">Select Department</option>
+                            <option value="swe">Software Engineering</option>
+                            <option value="admin">Administration</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="admin@university.edu" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="+880 1XXX-XXXXXX" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admin Access Code</label>
+                        <input type="password" placeholder="Enter admin access code" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" placeholder="Re-enter your password" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating shapes
+        function createFloatingShapes() {
+            const container = document.getElementById('floatingShapes');
+            const shapes = ['circle', 'square', 'triangle'];
+            const shapeCount = 15;
+
+            for (let i = 0; i < shapeCount; i++) {
+                const shape = document.createElement('div');
+                const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+                
+                shape.className = `shape shape-${shapeType}`;
+                
+                const size = Math.random() * 40 + 20;
+                if (shapeType !== 'triangle') {
+                    shape.style.width = size + 'px';
+                    shape.style.height = size + 'px';
+                }
+                
+                shape.style.left = Math.random() * 100 + '%';
+                shape.style.animationDuration = (Math.random() * 15 + 20) + 's';
+                shape.style.animationDelay = Math.random() * 10 + 's';
+                
+                container.appendChild(shape);
+            }
+        }
+
+        createFloatingShapes();
+
+        function toggleCRFields(show) {
+            const crFields = document.getElementById('crFields');
+            const crCode = document.getElementById('crCode');
+            const crSection = document.getElementById('crSection');
+            const crResponsibilities = document.getElementById('crResponsibilities');
+            
+            if (show) {
+                crFields.classList.add('active');
+                crCode.required = true;
+                crSection.required = true;
+            } else {
+                crFields.classList.remove('active');
+                crCode.required = false;
+                crSection.required = false;
+                crCode.value = '';
+                crSection.value = '';
+                crResponsibilities.value = '';
+            }
+        }
+
+        function showSignupForm(role) {
+            document.getElementById('roleSelection').classList.add('hidden');
+            
+            const forms = {
+                student: 'studentForm',
+                teacher: 'teacherForm',
+                admin: 'adminForm'
+            };
+            
+            document.getElementById(forms[role]).classList.add('active');
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const form = event.target;
+            const nameInput = form.querySelector('input[type="text"]');
+            const emailInput = form.querySelector('input[type="email"]');
+            const name = nameInput ? nameInput.value : 'Student';
+            const email = emailInput ? emailInput.value : '';
+            
+            // Check if this is student form with CR status
+            const crStatusInput = document.querySelector('input[name="crStatus"]:checked');
+            const isCR = crStatusInput ? crStatusInput.value === 'yes' : false;
+            
+            // Get current form type
+            const activeForm = document.querySelector('.signup-form.active');
+            let role = 'student';
+            if (activeForm.id === 'teacherForm') {
+                role = 'teacher';
+            } else if (activeForm.id === 'adminForm') {
+                role = 'admin';
+            }
+            
+            // Store user data in sessionStorage
+            sessionStorage.setItem('userRole', role);
+            sessionStorage.setItem('userName', name);
+            sessionStorage.setItem('userEmail', email);
+            
+            if (role === 'student') {
+                sessionStorage.setItem('isCR', isCR.toString());
+                
+                if (isCR) {
+                    const crSection = document.getElementById('crSection').value;
+                    sessionStorage.setItem('crSection', crSection);
+                }
+                
+                // Redirect to student dashboard with parameters
+                const params = new URLSearchParams({
+                    name: name,
+                    cr: isCR.toString()
+                });
+                
+                window.location.href = `student/dashboard.html?${params.toString()}`;
+            } else if (role === 'teacher') {
+                // Redirect to teacher dashboard
+                window.location.href = `teacher/dashboard.html?name=${encodeURIComponent(name)}`;
+            } else if (role === 'admin') {
+                // Redirect to admin dashboard
+                window.location.href = `admin/dashboard.html?name=${encodeURIComponent(name)}`;
+            }
+        }
+    </script>
+</body>
+</html>
