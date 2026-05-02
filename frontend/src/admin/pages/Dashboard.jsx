@@ -1,585 +1,852 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
+// import UserManagement from './UserManagement';
+// import StudentRecords from './StudentRecords';
+// import FacultyManagement from './FacultyManagement';
+// import Results from './Results';
+// import CourseCatalog from './CourseCatalog';
+// import AcademicCalendar from './AcademicCalendar';
+// import Settings from './Settings';
+// import Reports from './Reports';
+// import AdminProfile from './AdminProfile';
 
-const App = () => {
+// const Dashboard = () => {
+//   const [sidebarActive, setSidebarActive] = useState(false);
+//   const [currentPage, setCurrentPage] = useState('dashboard');
+//   const [searchTerm, setSearchTerm] = useState('');
+//   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+//   const [profile, setProfile] = useState({ name: 'EduAdmin', avatar: 'EA', email: 'eduadmin@swehub.com' });
+
+//   const menuItems = [
+//     { id: 'dashboard', name: 'Dashboard', icon: 'fa-tachometer-alt' },
+//     { id: 'users', name: 'User Management', icon: 'fa-users' },
+//     { id: 'students', name: 'Student Records', icon: 'fa-graduation-cap' },
+//     { id: 'faculty', name: 'Faculty Management', icon: 'fa-chalkboard-teacher' },
+//     { id: 'results', name: 'Results & Grades', icon: 'fa-chart-line' },
+//     { id: 'courses', name: 'Course Catalog', icon: 'fa-book' },
+//     { id: 'calendar', name: 'Academic Calendar', icon: 'fa-calendar-alt' },
+//     { id: 'settings', name: 'System Settings', icon: 'fa-cogs' },
+//     { id: 'reports', name: 'Reports & Export', icon: 'fa-file-alt' }
+//   ];
+
+//   const renderPage = () => {
+//     switch(currentPage) {
+//       case 'users': return <UserManagement />;
+//       case 'students': return <StudentRecords />;
+//       case 'faculty': return <FacultyManagement />;
+//       case 'results': return <Results />;
+//       case 'courses': return <CourseCatalog />;
+//       case 'calendar': return <AcademicCalendar />;
+//       case 'settings': return <Settings />;
+//       case 'reports': return <Reports />;
+//       case 'profile': return <AdminProfile onBack={() => setCurrentPage('dashboard')} />;
+//       default: return renderDashboard();
+//     }
+//   };
+
+//   const renderDashboard = () => {
+//     const stats = [
+//       { label: 'Total Students', value: '1,248', change: '+5.2%', icon: 'fa-users', color: '#667eea' },
+//       { label: 'Faculty Members', value: '48', change: '+2', icon: 'fa-chalkboard-teacher', color: '#10b981' },
+//       { label: 'Active Courses', value: '32', change: '+3', icon: 'fa-book', color: '#f59e0b' },
+//       { label: 'Pending Requests', value: '156', change: '-12', icon: 'fa-tasks', color: '#ef4444' }
+//     ];
+
+//     const activities = [
+//       { time: '10:23 AM', user: 'Dr. Sarah Johnson', action: 'Grade Submitted' },
+//       { time: '09:45 AM', user: 'John Smith', action: 'Course Registration' },
+//       { time: '09:15 AM', user: 'EduAdmin', action: 'User Created' }
+//     ];
+
+//     const alerts = [
+//       { title: 'Storage Warning', message: '85% capacity used', icon: 'fa-exclamation-triangle', color: '#f59e0b' },
+//       { title: 'Backup Scheduled', message: 'Tonight at 2:00 AM', icon: 'fa-database', color: '#3b82f6' },
+//       { title: 'Security Update', message: 'New patches available', icon: 'fa-shield-alt', color: '#ef4444' }
+//     ];
+
+//     return (
+//       <>
+//         <div style={{ marginBottom: '28px' }}>
+//           <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'white', marginBottom: '6px' }}>Dashboard</h1>
+//           <p style={{ color: '#94a3b8', fontSize: '14px' }}>Welcome back, {profile.name}</p>
+//         </div>
+
+//         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '28px' }}>
+//           {stats.map((stat, idx) => (
+//             <div key={idx} style={{ background: '#1a1a2e', borderRadius: '16px', padding: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+//               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+//                 <div>
+//                   <div style={{ fontSize: '28px', fontWeight: 700, color: 'white' }}>{stat.value}</div>
+//                   <div style={{ color: '#94a3b8', fontSize: '13px', marginTop: '4px' }}>{stat.label}</div>
+//                 </div>
+//                 <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${stat.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+//                   <i className={`fas ${stat.icon}`} style={{ color: stat.color, fontSize: '20px' }}></i>
+//                 </div>
+//               </div>
+//               <div style={{ marginTop: '12px', color: stat.change.startsWith('+') ? '#10b981' : '#ef4444', fontSize: '12px' }}>
+//                 <i className={`fas fa-arrow-${stat.change.startsWith('+') ? 'up' : 'down'}`}></i> {stat.change}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+//           <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+//             <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>Recent Activity</h2>
+//             {activities.map((act, idx) => (
+//               <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < activities.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+//                   <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(102,126,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+//                     <i className="fas fa-user" style={{ color: '#667eea', fontSize: '14px' }}></i>
+//                   </div>
+//                   <div>
+//                     <div style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>{act.user}</div>
+//                     <div style={{ color: '#94a3b8', fontSize: '12px' }}>{act.action}</div>
+//                   </div>
+//                 </div>
+//                 <div style={{ color: '#94a3b8', fontSize: '12px' }}>{act.time}</div>
+//               </div>
+//             ))}
+//           </div>
+
+//           <div>
+//             <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+//               <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>System Alerts</h2>
+//               {alerts.map((alert, idx) => (
+//                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: idx < alerts.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+//                   <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${alert.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+//                     <i className={`fas ${alert.icon}`} style={{ color: alert.color, fontSize: '14px' }}></i>
+//                   </div>
+//                   <div>
+//                     <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>{alert.title}</div>
+//                     <div style={{ color: '#94a3b8', fontSize: '11px' }}>{alert.message}</div>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+
+//             <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+//               <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>Upcoming Events</h2>
+//               <div style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+//                 <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Midterm Exams</div>
+//                 <div style={{ color: '#94a3b8', fontSize: '11px' }}>Mar 28-30, 2024</div>
+//               </div>
+//               <div style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+//                 <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Registration Opens</div>
+//                 <div style={{ color: '#94a3b8', fontSize: '11px' }}>Apr 15, 2024</div>
+//               </div>
+//               <div style={{ padding: '10px 0' }}>
+//                 <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Final Exams</div>
+//                 <div style={{ color: '#94a3b8', fontSize: '11px' }}>May 10-17, 2024</div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </>
+//     );
+//   };
+
+//   const handleLogout = () => {
+//     if (window.confirm('Are you sure you want to logout?')) {
+//       localStorage.removeItem('token');
+//       alert('Logged out successfully');
+//       window.location.href = '/login';
+//     }
+//   };
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       if (window.innerWidth > 768) setSidebarActive(false);
+//     };
+//     window.addEventListener('resize', handleResize);
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
+
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (showProfileDropdown && !event.target.closest('.profile-dropdown')) {
+//         setShowProfileDropdown(false);
+//       }
+//     };
+//     document.addEventListener('click', handleClickOutside);
+//     return () => document.removeEventListener('click', handleClickOutside);
+//   }, [showProfileDropdown]);
+
+//   return (
+//     <div style={{ minHeight: '100vh', background: '#0a0a15', fontFamily: 'Inter, sans-serif' }}>
+//       <style>{`
+//         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+//         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+//         * { margin: 0; padding: 0; box-sizing: border-box; }
+//         body { background: #0a0a15; }
+//         ::-webkit-scrollbar { width: 5px; }
+//         ::-webkit-scrollbar-track { background: #1a1a2e; }
+//         ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 5px; }
+//       `}</style>
+
+//       {/* Mobile Menu Button */}
+//       <div 
+//         onClick={() => setSidebarActive(!sidebarActive)} 
+//         style={{ 
+//           position: 'fixed', 
+//           top: '16px', 
+//           left: '16px', 
+//           zIndex: 1000, 
+//           width: '44px', 
+//           height: '44px', 
+//           background: '#1a1a2e', 
+//           borderRadius: '12px', 
+//           display: window.innerWidth <= 768 ? 'flex' : 'none', 
+//           alignItems: 'center', 
+//           justifyContent: 'center', 
+//           fontSize: '20px', 
+//           cursor: 'pointer', 
+//           border: '1px solid rgba(255,255,255,0.1)' 
+//         }}
+//       >
+//         <i className="fas fa-bars" style={{ color: 'white' }}></i>
+//       </div>
+
+//       <div style={{ display: 'flex', minHeight: '100vh' }}>
+//         {/* Sidebar */}
+//         <div style={{ 
+//           width: '280px', 
+//           background: '#0d0d1a', 
+//           borderRight: '1px solid rgba(255,255,255,0.05)', 
+//           position: 'fixed', 
+//           height: '100vh', 
+//           overflowY: 'auto',
+//           transition: 'transform 0.3s ease',
+//           transform: sidebarActive ? 'translateX(0)' : window.innerWidth <= 768 ? 'translateX(-100%)' : 'translateX(0)',
+//           zIndex: 99,
+//           display: 'flex',
+//           flexDirection: 'column'
+//         }}>
+//           {/* Logo Area */}
+//           <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+//             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+//               <div style={{ width: '42px', height: '42px', background: 'linear-gradient(135deg, #667eea, #764ba2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>⚙️</div>
+//               <div>
+//                 <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'white' }}>SWE<span style={{ color: '#667eea' }}>Hub</span></h2>
+//                 <p style={{ fontSize: '11px', color: '#667eea', marginTop: '2px' }}>Admin Portal</p>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Navigation Menu */}
+//           <nav style={{ flex: 1, padding: '20px 16px' }}>
+//             {menuItems.map((item) => (
+//               <div
+//                 key={item.id}
+//                 onClick={() => {
+//                   setCurrentPage(item.id);
+//                   if (window.innerWidth <= 768) setSidebarActive(false);
+//                 }}
+//                 style={{
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   gap: '14px',
+//                   padding: '12px 16px',
+//                   marginBottom: '4px',
+//                   borderRadius: '12px',
+//                   cursor: 'pointer',
+//                   transition: 'all 0.2s',
+//                   background: currentPage === item.id ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'transparent',
+//                   color: currentPage === item.id ? 'white' : '#94a3b8'
+//                 }}
+//               >
+//                 <i className={`fas ${item.icon}`} style={{ fontSize: '18px', width: '22px' }}></i>
+//                 <span style={{ fontSize: '14px', fontWeight: 500 }}>{item.name}</span>
+//               </div>
+//             ))}
+//           </nav>
+
+//           {/* User Profile Section in Sidebar */}
+//           <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+//             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: '#1a1a2e', borderRadius: '12px', marginBottom: '12px' }}>
+//               <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 600, color: 'white' }}>{profile.avatar}</div>
+//               <div>
+//                 <div style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>{profile.name}</div>
+//                 <div style={{ color: '#94a3b8', fontSize: '11px' }}>{profile.email}</div>
+//               </div>
+//             </div>
+//             <button 
+//               onClick={handleLogout} 
+//               style={{ 
+//                 width: '100%', 
+//                 padding: '10px', 
+//                 background: 'rgba(239,68,68,0.1)', 
+//                 border: '1px solid rgba(239,68,68,0.2)', 
+//                 color: '#ef4444', 
+//                 borderRadius: '10px', 
+//                 fontSize: '13px', 
+//                 fontWeight: 500, 
+//                 cursor: 'pointer', 
+//                 display: 'flex', 
+//                 alignItems: 'center', 
+//                 justifyContent: 'center', 
+//                 gap: '8px' 
+//               }}
+//             >
+//               <i className="fas fa-sign-out-alt"></i> Logout
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Main Content Area */}
+//         <div style={{ 
+//           marginLeft: window.innerWidth <= 768 ? '0' : '280px', 
+//           flex: 1, 
+//           padding: '24px 32px',
+//           width: '100%',
+//           background: '#0a0a15'
+//         }}>
+//           {/* Top Bar - COMPLETELY DARK, NO WHITE */}
+//           <div style={{ 
+//             display: 'flex', 
+//             justifyContent: 'space-between', 
+//             alignItems: 'center', 
+//             marginBottom: '24px', 
+//             flexWrap: 'wrap', 
+//             gap: '16px',
+//             background: '#0a0a15',
+//             padding: '0 0 16px 0',
+//             borderBottom: '1px solid rgba(255,255,255,0.05)'
+//           }}>
+//             <div>
+//               <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'white', marginBottom: '4px' }}>
+//                 {menuItems.find(i => i.id === currentPage)?.name || 'Dashboard'}
+//               </h1>
+//             </div>
+//             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+//               {/* Notification Bell */}
+//               <div style={{ position: 'relative', cursor: 'pointer' }}>
+//                 <i className="fas fa-bell" style={{ fontSize: '18px', color: '#94a3b8' }}></i>
+//                 <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: '#ef4444', width: '16px', height: '16px', borderRadius: '50%', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>5</span>
+//               </div>
+              
+//               {/* Admin Profile Dropdown */}
+//               <div className="profile-dropdown" style={{ position: 'relative' }}>
+//                 <div 
+//                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+//                   style={{ 
+//                     display: 'flex', 
+//                     alignItems: 'center', 
+//                     gap: '10px', 
+//                     cursor: 'pointer',
+//                     padding: '6px 12px',
+//                     borderRadius: '30px',
+//                     background: '#1a1a2e',
+//                     border: '1px solid rgba(102,126,234,0.3)'
+//                   }}
+//                 >
+//                   <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 600, color: 'white' }}>{profile.avatar}</div>
+//                   <span style={{ color: 'white', fontSize: '13px', fontWeight: 500, display: window.innerWidth <= 768 ? 'none' : 'inline' }}>{profile.name}</span>
+//                   <i className="fas fa-chevron-down" style={{ fontSize: '10px', color: '#667eea' }}></i>
+//                 </div>
+                
+//                 {showProfileDropdown && (
+//                   <div style={{
+//                     position: 'absolute',
+//                     top: '50px',
+//                     right: '0',
+//                     width: '220px',
+//                     background: '#1a1a2e',
+//                     borderRadius: '12px',
+//                     border: '1px solid rgba(102,126,234,0.3)',
+//                     overflow: 'hidden',
+//                     zIndex: 100,
+//                     boxShadow: '0 8px 25px rgba(0,0,0,0.3)'
+//                   }}>
+//                     <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+//                       <div style={{ fontWeight: 600, color: 'white' }}>{profile.name}</div>
+//                       <div style={{ fontSize: '11px', color: '#94a3b8' }}>{profile.email}</div>
+//                     </div>
+//                     <div 
+//                       onClick={() => {
+//                         setCurrentPage('profile');
+//                         setShowProfileDropdown(false);
+//                         if (window.innerWidth <= 768) setSidebarActive(false);
+//                       }}
+//                       style={{ padding: '12px 16px', cursor: 'pointer', transition: 'all 0.2s', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '10px' }}
+//                       onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(102,126,234,0.1)'}
+//                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+//                     >
+//                       <i className="fas fa-user-circle" style={{ width: '18px', color: '#667eea' }}></i>
+//                       <span>My Profile</span>
+//                     </div>
+//                     <div 
+//                       onClick={handleLogout}
+//                       style={{ padding: '12px 16px', cursor: 'pointer', transition: 'all 0.2s', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}
+//                       onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'}
+//                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+//                     >
+//                       <i className="fas fa-sign-out-alt" style={{ width: '18px' }}></i>
+//                       <span>Logout</span>
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+
+//               {/* Search Bar */}
+//               <div style={{ position: 'relative' }}>
+//                 <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#667eea', fontSize: '12px' }}></i>
+//                 <input 
+//                   type="text" 
+//                   placeholder="Search..." 
+//                   value={searchTerm} 
+//                   onChange={(e) => setSearchTerm(e.target.value)} 
+//                   style={{ 
+//                     padding: '8px 12px 8px 32px', 
+//                     background: '#1a1a2e', 
+//                     border: '1px solid rgba(102,126,234,0.3)', 
+//                     borderRadius: '10px', 
+//                     color: 'white', 
+//                     fontSize: '13px', 
+//                     width: '220px',
+//                     outline: 'none'
+//                   }} 
+//                 />
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Page Content */}
+//           <div style={{ background: '#0a0a15' }}>
+//             {renderPage()}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+// export default Dashboard;
+
+import React, { useState, useEffect } from 'react';
+import UserManagement from './UserManagement';
+import StudentRecords from './StudentRecords';
+import FacultyManagement from './FacultyManagement';
+import Results from './Results';
+import CourseCatalog from './CourseCatalog';
+import AcademicCalendar from './AcademicCalendar';
+import Settings from './Settings';
+import Reports from './Reports';
+import AdminProfile from './AdminProfile';
+
+const Dashboard = () => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
-  const [notifications, setNotifications] = useState(5);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [profile, setProfile] = useState({ name: 'EduAdmin', avatar: 'EA', email: 'eduadmin@swehub.com' });
 
-  // Dashboard data
-  const stats = {
-    totalStudents: { value: '1,248', change: '+5.2%', positive: true },
-    facultyMembers: { value: '48', change: '+2 new hires', positive: true },
-    activeCourses: { value: '32', change: '+3 this semester', positive: true },
-    pendingRequests: { value: '156', change: '-12 from yesterday', positive: false }
+  const menuItems = [
+    { id: 'dashboard', name: 'Dashboard', icon: 'fa-tachometer-alt' },
+    { id: 'users', name: 'User Management', icon: 'fa-users' },
+    { id: 'students', name: 'Student Records', icon: 'fa-graduation-cap' },
+    { id: 'faculty', name: 'Faculty Management', icon: 'fa-chalkboard-teacher' },
+    { id: 'results', name: 'Results & Grades', icon: 'fa-chart-line' },
+    { id: 'courses', name: 'Course Catalog', icon: 'fa-book' },
+    { id: 'calendar', name: 'Academic Calendar', icon: 'fa-calendar-alt' },
+    { id: 'settings', name: 'System Settings', icon: 'fa-cogs' },
+    { id: 'reports', name: 'Reports & Export', icon: 'fa-file-alt' }
+  ];
+
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'users': return <UserManagement />;
+      case 'students': return <StudentRecords />;
+      case 'faculty': return <FacultyManagement />;
+      case 'results': return <Results />;
+      case 'courses': return <CourseCatalog />;
+      case 'calendar': return <AcademicCalendar />;
+      case 'settings': return <Settings />;
+      case 'reports': return <Reports />;
+      case 'profile': return <AdminProfile onBack={() => setCurrentPage('dashboard')} />;
+      default: return renderDashboard();
+    }
   };
 
-  const activities = [
-    { time: '10:23 AM', user: 'Dr. Sarah Johnson', action: 'Grade Submitted', details: 'CS301 - Final Grades' },
-    { time: '09:45 AM', user: 'John Smith', action: 'Course Registration', details: 'Registered for CS401' },
-    { time: '09:15 AM', user: 'Admin Officer', action: 'User Created', details: 'New faculty account' },
-    { time: 'Yesterday', user: 'System', action: 'Backup Completed', details: 'Daily system backup' },
-    { time: 'Yesterday', user: 'Michael Brown', action: 'Password Reset', details: 'Account security update' }
-  ];
+  const renderDashboard = () => {
+    const stats = [
+      { label: 'Total Students', value: '1,248', change: '+5.2%', icon: 'fa-users', color: '#667eea' },
+      { label: 'Faculty Members', value: '48', change: '+2', icon: 'fa-chalkboard-teacher', color: '#10b981' },
+      { label: 'Active Courses', value: '32', change: '+3', icon: 'fa-book', color: '#f59e0b' },
+      { label: 'Pending Requests', value: '156', change: '-12', icon: 'fa-tasks', color: '#ef4444' }
+    ];
 
-  const alerts = [
-    { type: 'storage', title: 'Storage Warning', message: '85% of storage capacity used', icon: 'fa-exclamation-triangle' },
-    { type: 'backup', title: 'Backup Scheduled', message: 'Tonight at 2:00 AM - 4:00 AM', icon: 'fa-database' },
-    { type: 'security', title: 'Security Update', message: 'New security patches available', icon: 'fa-shield-alt' }
-  ];
+    const activities = [
+      { time: '10:23 AM', user: 'Dr. Sarah Johnson', action: 'Grade Submitted' },
+      { time: '09:45 AM', user: 'John Smith', action: 'Course Registration' },
+      { time: '09:15 AM', user: 'EduAdmin', action: 'User Created' }
+    ];
 
-  const upcomingEvents = [
-    { title: 'Midterm Exams', date: 'Mar 28-30, 2024', type: 'Exam', color: 'warning' },
-    { title: 'Registration Opens', date: 'Apr 15, 2024', type: 'Admin', color: 'info' },
-    { title: 'Final Exams', date: 'May 10-17, 2024', type: 'Exam', color: 'warning' }
-  ];
+    const alerts = [
+      { title: 'Storage Warning', message: '85% capacity used', icon: 'fa-exclamation-triangle', color: '#f59e0b' },
+      { title: 'Backup Scheduled', message: 'Tonight at 2:00 AM', icon: 'fa-database', color: '#3b82f6' },
+      { title: 'Security Update', message: 'New patches available', icon: 'fa-shield-alt', color: '#ef4444' }
+    ];
 
-  const performanceIndicators = [
-    { label: 'System Uptime', value: '99.8%' },
-    { label: 'Server Load', value: '42%' },
-    { label: 'Active Sessions', value: '248' },
-    { label: 'Storage Used', value: '85%' }
-  ];
+    return (
+      <>
+        <div style={{ marginBottom: '28px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 700, background: 'linear-gradient(135deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '6px' }}>Dashboard</h1>
+          <p style={{ color: '#94a3b8', fontSize: '14px' }}>Welcome back, {profile.name}</p>
+        </div>
 
-  const quickActions = [
-    { title: 'Add New User', desc: 'Create student/teacher accounts', icon: 'fa-user-plus', action: 'addUser' },
-    { title: 'Upload Results', desc: 'Bulk upload student grades', icon: 'fa-file-upload', action: 'uploadResults' },
-    { title: 'Schedule Event', desc: 'Add to academic calendar', icon: 'fa-calendar-plus', action: 'scheduleEvent' },
-    { title: 'Create Announcement', desc: 'Send system-wide message', icon: 'fa-bullhorn', action: 'announcement' }
-  ];
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '28px' }}>
+          {stats.map((stat, idx) => (
+            <div key={idx} style={{ background: '#1a1a2e', borderRadius: '16px', padding: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: 700, color: 'white' }}>{stat.value}</div>
+                  <div style={{ color: '#94a3b8', fontSize: '13px', marginTop: '4px' }}>{stat.label}</div>
+                </div>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${stat.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i className={`fas ${stat.icon}`} style={{ color: stat.color, fontSize: '20px' }}></i>
+                </div>
+              </div>
+              <div style={{ marginTop: '12px', color: stat.change.startsWith('+') ? '#10b981' : '#ef4444', fontSize: '12px' }}>
+                <i className={`fas fa-arrow-${stat.change.startsWith('+') ? 'up' : 'down'}`}></i> {stat.change}
+              </div>
+            </div>
+          ))}
+        </div>
 
-  const adminActions = [
-    { title: 'System Settings', desc: 'Configure system parameters', icon: 'fa-cog', action: 'settings' },
-    { title: 'Backup & Restore', desc: 'Manage system backups', icon: 'fa-database', action: 'backup' },
-    { title: 'Audit Logs', desc: 'View system activity logs', icon: 'fa-clipboard-list', action: 'audit' },
-    { title: 'Announcements', desc: 'Send system-wide messages', icon: 'fa-bullhorn', action: 'announce' }
-  ];
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+          <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>Recent Activity</h2>
+            {activities.map((act, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < activities.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(102,126,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-user" style={{ color: '#667eea', fontSize: '14px' }}></i>
+                  </div>
+                  <div>
+                    <div style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>{act.user}</div>
+                    <div style={{ color: '#94a3b8', fontSize: '12px' }}>{act.action}</div>
+                  </div>
+                </div>
+                <div style={{ color: '#94a3b8', fontSize: '12px' }}>{act.time}</div>
+              </div>
+            ))}
+          </div>
 
-  // Calendar data
-  const calendarEvents = {
-    1: [{ title: 'Semester Begins', type: 'academic' }],
-    2: [{ title: 'Add/Drop Period', type: 'academic' }],
-    3: [{ title: 'Add/Drop Period', type: 'academic' }],
-    11: [{ title: 'Spring Break', type: 'holiday' }],
-    12: [{ title: 'Spring Break', type: 'holiday' }],
-    13: [{ title: 'Spring Break', type: 'holiday' }],
-    14: [{ title: 'Spring Break', type: 'holiday' }],
-    15: [{ title: 'Spring Break', type: 'holiday' }],
-    18: [{ title: 'Classes Resume', type: 'academic' }],
-    28: [{ title: 'Midterm Exams', type: 'exam' }],
-    29: [{ title: 'Midterm Exams', type: 'exam' }],
-    30: [{ title: 'Midterm Exams', type: 'exam' }]
-  };
+          <div>
+            <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>System Alerts</h2>
+              {alerts.map((alert, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: idx < alerts.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: `${alert.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className={`fas ${alert.icon}`} style={{ color: alert.color, fontSize: '14px' }}></i>
+                  </div>
+                  <div>
+                    <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>{alert.title}</div>
+                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>{alert.message}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-  const calendarTable = [
-    { date: 28, events: [{ title: 'Semester Begins', type: 'academic' }] },
-    { date: 29, events: [{ title: 'Add/Drop Period', type: 'academic' }] },
-    { date: 30, events: [{ title: 'Add/Drop Period', type: 'academic' }] }
-  ];
-
-  const handleAlert = (msg) => {
-    alert(msg);
+            <div style={{ background: '#1a1a2e', borderRadius: '20px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'white', marginBottom: '16px' }}>Upcoming Events</h2>
+              <div style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Midterm Exams</div>
+                <div style={{ color: '#94a3b8', fontSize: '11px' }}>Mar 28-30, 2024</div>
+              </div>
+              <div style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Registration Opens</div>
+                <div style={{ color: '#94a3b8', fontSize: '11px' }}>Apr 15, 2024</div>
+              </div>
+              <div style={{ padding: '10px 0' }}>
+                <div style={{ color: 'white', fontSize: '13px', fontWeight: 500 }}>Final Exams</div>
+                <div style={{ color: '#94a3b8', fontSize: '11px' }}>May 10-17, 2024</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
   };
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?\n\nAny unsaved changes will be lost.')) {
-      alert('Logging out... Redirecting to login page.');
+    if (window.confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      alert('Logged out successfully');
+      window.location.href = '/login';
     }
   };
 
-  const toggleNotifications = () => {
-    alert('Showing Notifications:\n\n1. System Maintenance (High Priority)\n2. New User Registration Approval (5 pending)\n3. Storage Limit Warning (85% used)\n4. Security Alert: Multiple failed logins\n5. Backup Completed Successfully\n\nTotal Unread: 5 notifications');
-  };
-
-  const showDashboard = () => {
-    setCurrentPage('dashboard');
-    document.title = 'SWEHub - Admin Dashboard';
-    if (window.innerWidth <= 992) setSidebarActive(false);
-  };
-
-  const showGenericPage = (title, icon) => {
-    setCurrentPage(title.toLowerCase().replace(/ /g, '-'));
-    document.title = `SWEHub - ${title}`;
-    if (window.innerWidth <= 992) setSidebarActive(false);
-  };
-
-  // CSS Styles
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%)',
-      fontFamily: "'Inter', sans-serif",
-      position: 'relative'
-    },
-    background: {
-      position: 'fixed',
-      width: '100%',
-      height: '100%',
-      background: 'radial-gradient(ellipse at 10% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%)',
-      zIndex: -2
-    },
-    orb1: {
-      position: 'fixed',
-      width: '800px',
-      height: '800px',
-      background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)',
-      top: '-30%',
-      left: '-20%',
-      borderRadius: '50%',
-      filter: 'blur(120px)',
-      zIndex: -1
-    },
-    orb2: {
-      position: 'fixed',
-      width: '600px',
-      height: '600px',
-      background: 'radial-gradient(circle, rgba(118, 75, 162, 0.12) 0%, transparent 70%)',
-      bottom: '-20%',
-      right: '-15%',
-      borderRadius: '50%',
-      filter: 'blur(120px)',
-      zIndex: -1
-    },
-    sidebar: {
-      width: '280px',
-      background: 'rgba(255, 255, 255, 0.03)',
-      backdropFilter: 'blur(20px)',
-      borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '30px 0',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'fixed',
-      height: '100vh',
-      zIndex: 100,
-      transition: 'transform 0.3s ease',
-      transform: sidebarActive ? 'translateX(0)' : 'translateX(-100%)'
-    },
-    mainContent: {
-      flex: 1,
-      marginLeft: '280px',
-      padding: '30px',
-      transition: 'margin-left 0.3s ease'
-    },
-    mobileMenuToggle: {
-      display: window.innerWidth <= 992 ? 'flex' : 'none',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      width: '50px',
-      height: '50px',
-      borderRadius: '14px',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '22px',
-      color: 'white',
-      cursor: 'pointer',
-      position: 'fixed',
-      top: '20px',
-      left: '20px',
-      zIndex: 1000
-    },
-    statCard: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '20px',
-      padding: '28px',
-      transition: 'all 0.3s ease',
-      cursor: 'pointer'
-    },
-    systemOverview: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '24px',
-      padding: '32px',
-      marginBottom: '30px'
-    },
-    btnPrimary: {
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: 600,
-      fontSize: '14px',
-      cursor: 'pointer',
-      border: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
-    },
-    btnSecondary: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: 600,
-      fontSize: '14px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
-    },
-    dataTable: {
-      width: '100%',
-      borderCollapse: 'separate',
-      borderSpacing: 0
-    },
-    quickActionCard: {
-      background: 'rgba(255, 255, 255, 0.03)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '16px',
-      padding: '24px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px',
-      cursor: 'pointer',
-      transition: 'all 0.3s'
-    },
-    alertItem: {
-      display: 'flex',
-      alignItems: 'flex-start',
-      padding: '16px',
-      background: 'rgba(245, 158, 11, 0.1)',
-      border: '1px solid rgba(245, 158, 11, 0.2)',
-      borderRadius: '12px',
-      marginBottom: '12px',
-      cursor: 'pointer'
-    }
-  };
-
-  // Update mobile styles on resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 992) {
-        document.querySelector('.mobile-toggle-style')?.style.setProperty('display', 'flex');
-      } else {
-        document.querySelector('.mobile-toggle-style')?.style.setProperty('display', 'none');
-        setSidebarActive(false);
-      }
+      if (window.innerWidth > 768) setSidebarActive(false);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Dashboard Render
-  const renderDashboard = () => (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
-        <div>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'white', marginBottom: '8px' }}>Admin Dashboard</h1>
-          <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '15px' }}>
-            System administration and management portal - Last updated: {new Date().toLocaleString()}
-          </p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ position: 'relative' }}>
-            <div onClick={toggleNotifications} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', width: '48px', height: '48px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <i className="fas fa-bell"></i>
-              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#ef4444', color: 'white', fontSize: '12px', fontWeight: 700, width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{notifications}</span>
-            </div>
-          </div>
-          <div style={{ position: 'relative', width: '300px' }}>
-            <i className="fas fa-search" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.6)' }}></i>
-            <input 
-              type="text" 
-              placeholder="Search users, courses, records..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchTerm && alert(`Searching for: "${searchTerm}"`)}
-              style={{ width: '100%', padding: '16px 20px 16px 50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', color: 'white', fontSize: '15px' }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '40px' }}>
-        {Object.entries(stats).map(([key, stat]) => (
-          <div key={key} style={styles.statCard} onClick={() => handleAlert(`${key}: ${stat.value}`)}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', marginBottom: '20px', background: 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1))' }}>
-              <i className={`fas fa-${key === 'totalStudents' ? 'users' : key === 'facultyMembers' ? 'chalkboard-teacher' : key === 'activeCourses' ? 'book' : 'tasks'}`}></i>
-            </div>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: 'white', marginBottom: '8px' }}>{stat.value}</div>
-            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
-            <div style={{ fontSize: '12px', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px', color: stat.positive ? '#10b981' : '#ef4444' }}>
-              <i className={`fas fa-arrow-${stat.positive ? 'up' : 'down'}`}></i>
-              <span>{stat.change}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
-        {/* Left Column */}
-        <div>
-          {/* System Overview */}
-          <div style={styles.systemOverview}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'white' }}>System Overview</h2>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button style={styles.btnPrimary} onClick={() => handleAlert('Generating System Report...')}>
-                  <i className="fas fa-file-export"></i> Generate Report
-                </button>
-                <button style={styles.btnSecondary} onClick={() => handleAlert('Dashboard Refreshed')}>
-                  <i className="fas fa-sync-alt"></i> Refresh
-                </button>
-              </div>
-            </div>
-
-            {/* Performance Indicators */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px', marginTop: '20px' }}>
-              {performanceIndicators.map((indicator, idx) => (
-                <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '12px', padding: '15px', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleAlert(`${indicator.label}: ${indicator.value}`)}>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: 'white', marginBottom: '5px' }}>{indicator.value}</div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{indicator.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Actions */}
-            <div style={{ marginTop: '30px' }}>
-              <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>Quick Actions</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                {quickActions.map((action, idx) => (
-                  <div key={idx} style={styles.quickActionCard} onClick={() => handleAlert(`${action.title}: ${action.desc}`)}>
-                    <div style={{ width: '50px', height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', background: 'linear-gradient(135deg, #667eea, #764ba2)', color: 'white' }}>
-                      <i className={`fas ${action.icon}`}></i>
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'white', marginBottom: '4px' }}>{action.title}</h4>
-                      <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{action.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div style={styles.systemOverview}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'white' }}>Recent Activity</h2>
-              <a href="#" style={{ color: '#667eea', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => showGenericPage('Security Logs', 'fa-shield-alt')}>
-                View All <i className="fas fa-arrow-right"></i>
-              </a>
-            </div>
-            <table style={styles.dataTable}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', fontSize: '13px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Time</th>
-                  <th style={{ textAlign: 'left', padding: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', fontSize: '13px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>User</th>
-                  <th style={{ textAlign: 'left', padding: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', fontSize: '13px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Action</th>
-                  <th style={{ textAlign: 'left', padding: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', fontSize: '13px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activities.map((activity, idx) => (
-                  <tr key={idx} style={{ cursor: 'pointer', transition: 'all 0.3s' }} onClick={() => handleAlert(`${activity.user}: ${activity.action} - ${activity.details}`)}>
-                    <td style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{activity.time}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{activity.user}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{activity.action}</td>
-                    <td style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{activity.details}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-          {/* System Alerts */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'white' }}>System Alerts</h2>
-            </div>
-            {alerts.map((alert, idx) => (
-              <div key={idx} style={styles.alertItem} onClick={() => handleAlert(`${alert.title}: ${alert.message}`)}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', marginRight: '15px', background: 'rgba(245,158,11,0.2)', color: '#f59e0b' }}>
-                  <i className={`fas ${alert.icon}`}></i>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'white', marginBottom: '4px' }}>{alert.title}</div>
-                  <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{alert.message}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Quick Admin Actions */}
-          <div style={styles.systemOverview}>
-            <div style={{ marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'white' }}>Quick Admin Actions</h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-              {adminActions.map((action, idx) => (
-                <div key={idx} style={styles.quickActionCard} onClick={() => showGenericPage(action.title, action.icon)}>
-                  <div style={{ width: '50px', height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', background: 'linear-gradient(135deg, #667eea, #764ba2)', color: 'white' }}>
-                    <i className={`fas ${action.icon}`}></i>
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'white', marginBottom: '4px' }}>{action.title}</h4>
-                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>{action.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Upcoming Events */}
-          <div style={styles.systemOverview}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'white' }}>Upcoming Events</h2>
-              <a href="#" style={{ color: '#667eea', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => showGenericPage('Academic Calendar', 'fa-calendar-alt')}>
-                View Calendar <i className="fas fa-arrow-right"></i>
-              </a>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {upcomingEvents.map((event, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', cursor: 'pointer' }} onClick={() => handleAlert(`${event.title}: ${event.date}`)}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'white' }}>{event.title}</div>
-                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{event.date}</div>
-                  </div>
-                  <div style={{ padding: '4px 8px', background: event.color === 'warning' ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)', color: event.color === 'warning' ? '#f59e0b' : '#3b82f6', borderRadius: '6px', fontSize: '12px', fontWeight: 600 }}>
-                    {event.type}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
-  // Generic Page Render
-  const renderGenericPage = (title, icon) => (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
-        <div>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'white', marginBottom: '8px' }}>{title}</h1>
-          <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '15px' }}>Manage {title.toLowerCase()} settings and configurations</p>
-        </div>
-        <div style={{ position: 'relative', width: '300px' }}>
-          <i className="fas fa-search" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.6)' }}></i>
-          <input type="text" placeholder={`Search ${title.toLowerCase()}...`} style={{ width: '100%', padding: '16px 20px 16px 50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', color: 'white', fontSize: '15px' }} />
-        </div>
-      </div>
-      <div style={{ textAlign: 'center', padding: '100px 20px', background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px' }}>
-        <i className={`fas ${icon}`} style={{ fontSize: '64px', color: 'rgba(255,255,255,0.6)', marginBottom: '20px' }}></i>
-        <h2 style={{ marginBottom: '10px', color: 'white' }}>{title} Module</h2>
-        <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '30px' }}>This is a demo page. In a real application, this would show the {title.toLowerCase()} interface.</p>
-        <button style={styles.btnPrimary} onClick={showDashboard}>
-          <i className="fas fa-arrow-left"></i> Back to Dashboard
-        </button>
-      </div>
-    </>
-  );
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showProfileDropdown && !event.target.closest('.profile-dropdown')) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showProfileDropdown]);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.background}></div>
-      <div style={styles.orb1}></div>
-      <div style={styles.orb2}></div>
+    <div style={{ minHeight: '100vh', background: '#0a0a15', fontFamily: 'Inter, sans-serif' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a15; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 5px; }
+      `}</style>
 
-      {/* Mobile Menu Toggle */}
+      {/* Mobile Menu Button */}
       <div 
-        className="mobile-toggle-style"
-        style={styles.mobileMenuToggle}
-        onClick={() => setSidebarActive(!sidebarActive)}
+        onClick={() => setSidebarActive(!sidebarActive)} 
+        style={{ 
+          position: 'fixed', 
+          top: '16px', 
+          left: '16px', 
+          zIndex: 1000, 
+          width: '44px', 
+          height: '44px', 
+          background: '#1a1a2e', 
+          borderRadius: '12px', 
+          display: window.innerWidth <= 768 ? 'flex' : 'none', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          fontSize: '20px', 
+          cursor: 'pointer', 
+          border: '1px solid rgba(255,255,255,0.1)' 
+        }}
       >
-        <i className="fas fa-bars"></i>
+        <i className="fas fa-bars" style={{ color: 'white' }}></i>
       </div>
 
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         {/* Sidebar */}
-        <aside style={styles.sidebar} id="sidebar">
-          <div style={{ padding: '0 30px 40px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div style={{ width: '42px', height: '42px', background: 'linear-gradient(135deg, #667eea, #764ba2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>⚙️</div>
+        <div style={{ 
+          width: '280px', 
+          background: '#0d0d1a', 
+          borderRight: '1px solid rgba(255,255,255,0.05)', 
+          position: 'fixed', 
+          height: '100vh', 
+          overflowY: 'auto',
+          transition: 'transform 0.3s ease',
+          transform: sidebarActive ? 'translateX(0)' : window.innerWidth <= 768 ? 'translateX(-100%)' : 'translateX(0)',
+          zIndex: 99,
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Logo Area */}
+          <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '42px', height: '42px', background: 'linear-gradient(135deg, #667eea, #764ba2)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>⚙️</div>
               <div>
-                <h2 style={{ fontSize: '24px', fontWeight: 800, color: 'white', marginBottom: '4px' }}>SWE<span style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hub</span></h2>
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>Admin Dashboard</p>
+                <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'white' }}>SWE<span style={{ color: '#667eea' }}>Hub</span></h2>
+                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '2px' }}>Administration Panel</p>
               </div>
             </div>
           </div>
 
-          <nav style={{ flex: 1, padding: '0 20px', overflowY: 'auto' }}>
-            {[
-              { id: 'dashboard', name: 'Dashboard', icon: 'fa-home' },
-              { id: 'user-management', name: 'User Management', icon: 'fa-users' },
-              { id: 'student-records', name: 'Student Records', icon: 'fa-graduation-cap' },
-              { id: 'faculty-management', name: 'Faculty Management', icon: 'fa-chalkboard-teacher' },
-              { id: 'results-grades', name: 'Results & Grades', icon: 'fa-chart-bar' },
-              { id: 'course-catalog', name: 'Course Catalog', icon: 'fa-book' },
-              { id: 'academic-calendar', name: 'Academic Calendar', icon: 'fa-calendar-alt' },
-              { id: 'system-settings', name: 'System Settings', icon: 'fa-cogs' },
-              { id: 'security-logs', name: 'Security & Logs', icon: 'fa-shield-alt' },
-              { id: 'reports-export', name: 'Reports & Export', icon: 'fa-file-export' }
-            ].map(item => (
+          {/* Navigation Menu */}
+          <nav style={{ flex: 1, padding: '20px 16px' }}>
+            {menuItems.map((item) => (
               <div
                 key={item.id}
-                className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                onClick={() => {
+                  setCurrentPage(item.id);
+                  if (window.innerWidth <= 768) setSidebarActive(false);
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '15px',
-                  padding: '12px 18px',
-                  color: currentPage === item.id ? 'white' : 'rgba(255,255,255,0.6)',
-                  textDecoration: 'none',
+                  gap: '14px',
+                  padding: '12px 16px',
+                  marginBottom: '4px',
                   borderRadius: '12px',
-                  marginBottom: '6px',
-                  transition: 'all 0.3s ease',
-                  fontWeight: 500,
                   cursor: 'pointer',
+                  transition: 'all 0.2s',
                   background: currentPage === item.id ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'transparent',
-                  boxShadow: currentPage === item.id ? '0 4px 15px rgba(102,126,234,0.3)' : 'none'
-                }}
-                onClick={() => {
-                  if (item.id === 'dashboard') showDashboard();
-                  else showGenericPage(item.name, item.icon);
+                  color: currentPage === item.id ? 'white' : '#94a3b8'
                 }}
               >
-                <i className={`fas ${item.icon}`} style={{ fontSize: '18px', width: '20px', textAlign: 'center' }}></i>
-                <span>{item.name}</span>
+                <i className={`fas ${item.icon}`} style={{ fontSize: '18px', width: '22px' }}></i>
+                <span style={{ fontSize: '14px', fontWeight: 500 }}>{item.name}</span>
               </div>
             ))}
           </nav>
 
-          <div style={{ padding: '20px 30px 0', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '18px', background: 'rgba(255,255,255,0.05)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #ef4444, #f87171)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 600, color: 'white' }}>AD</div>
+          {/* User Profile Section in Sidebar - Logout only here */}
+          <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: '#1a1a2e', borderRadius: '12px', marginBottom: '12px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 600, color: 'white' }}>{profile.avatar}</div>
               <div>
-                <h4 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '4px', color: 'white' }}>Admin Officer</h4>
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>System Administrator</p>
+                <div style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>{profile.name}</div>
+                <div style={{ color: '#94a3b8', fontSize: '11px' }}>{profile.email}</div>
               </div>
             </div>
-            <button onClick={handleLogout} style={{ width: '100%', marginTop: '15px', padding: '12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <button 
+              onClick={handleLogout} 
+              style={{ 
+                width: '100%', 
+                padding: '10px', 
+                background: 'rgba(239,68,68,0.1)', 
+                border: '1px solid rgba(239,68,68,0.2)', 
+                color: '#ef4444', 
+                borderRadius: '10px', 
+                fontSize: '13px', 
+                fontWeight: 500, 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '8px' 
+              }}
+            >
               <i className="fas fa-sign-out-alt"></i> Logout
             </button>
           </div>
-        </aside>
+        </div>
 
-        {/* Main Content */}
-        <main style={styles.mainContent}>
-          {currentPage === 'dashboard' ? renderDashboard() : renderGenericPage(
-            currentPage.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-            currentPage === 'user-management' ? 'fa-users' :
-            currentPage === 'student-records' ? 'fa-graduation-cap' :
-            currentPage === 'faculty-management' ? 'fa-chalkboard-teacher' :
-            currentPage === 'results-grades' ? 'fa-chart-bar' :
-            currentPage === 'course-catalog' ? 'fa-book' :
-            currentPage === 'academic-calendar' ? 'fa-calendar-alt' :
-            currentPage === 'system-settings' ? 'fa-cogs' :
-            currentPage === 'security-logs' ? 'fa-shield-alt' : 'fa-file-export'
-          )}
-        </main>
+        {/* Main Content Area */}
+        <div style={{ 
+          marginLeft: window.innerWidth <= 768 ? '0' : '280px', 
+          flex: 1, 
+          padding: '24px 32px',
+          width: '100%',
+          background: '#0a0a15'
+        }}>
+          {/* Top Bar */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '24px', 
+            flexWrap: 'wrap', 
+            gap: '16px',
+            background: '#0a0a15',
+            padding: '0 0 16px 0',
+            borderBottom: '1px solid rgba(255,255,255,0.05)'
+          }}>
+            <div>
+              <h1 style={{ fontSize: '28px', fontWeight: 700, background: 'linear-gradient(135deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '4px' }}>
+                {menuItems.find(i => i.id === currentPage)?.name || 'Dashboard'}
+              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                <span style={{ 
+                  fontSize: '13px', 
+                  fontWeight: 500,
+                  background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  🎓 EduAdmin
+                </span>
+                <span style={{ color: '#94a3b8', fontSize: '13px' }}>/</span>
+                <span style={{ color: '#94a3b8', fontSize: '13px' }}>{menuItems.find(i => i.id === currentPage)?.name || 'Dashboard'}</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              {/* Notification Bell */}
+              <div style={{ position: 'relative', cursor: 'pointer' }}>
+                <i className="fas fa-bell" style={{ fontSize: '18px', color: '#94a3b8' }}></i>
+                <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: '#ef4444', width: '16px', height: '16px', borderRadius: '50%', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>5</span>
+              </div>
+              
+              {/* Admin Profile Dropdown */}
+              <div className="profile-dropdown" style={{ position: 'relative' }}>
+                <div 
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '10px', 
+                    cursor: 'pointer',
+                    padding: '6px 12px',
+                    borderRadius: '30px',
+                    background: '#1a1a2e',
+                    border: '1px solid rgba(102,126,234,0.3)'
+                  }}
+                >
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 600, color: 'white' }}>{profile.avatar}</div>
+                  <span style={{ color: 'white', fontSize: '13px', fontWeight: 500, display: window.innerWidth <= 768 ? 'none' : 'inline' }}>{profile.name}</span>
+                  <i className="fas fa-chevron-down" style={{ fontSize: '10px', color: '#667eea' }}></i>
+                </div>
+                
+                {showProfileDropdown && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50px',
+                    right: '0',
+                    width: '220px',
+                    background: '#1a1a2e',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(102,126,234,0.3)',
+                    overflow: 'hidden',
+                    zIndex: 100,
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.3)'
+                  }}>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontWeight: 600, color: 'white' }}>{profile.name}</div>
+                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>{profile.email}</div>
+                    </div>
+                    <div 
+                      onClick={() => {
+                        setCurrentPage('profile');
+                        setShowProfileDropdown(false);
+                        if (window.innerWidth <= 768) setSidebarActive(false);
+                      }}
+                      style={{ padding: '12px 16px', cursor: 'pointer', transition: 'all 0.2s', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '10px' }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(102,126,234,0.1)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <i className="fas fa-user-circle" style={{ width: '18px', color: '#667eea' }}></i>
+                      <span>My Profile</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Search Bar */}
+              <div style={{ position: 'relative' }}>
+                <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#667eea', fontSize: '12px' }}></i>
+                <input 
+                  type="text" 
+                  placeholder="Search..." 
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)} 
+                  style={{ 
+                    padding: '8px 12px 8px 32px', 
+                    background: '#1a1a2e', 
+                    border: '1px solid rgba(102,126,234,0.3)', 
+                    borderRadius: '10px', 
+                    color: 'white', 
+                    fontSize: '13px', 
+                    width: '220px',
+                    outline: 'none'
+                  }} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Page Content */}
+          <div style={{ background: '#0a0a15' }}>
+            {renderPage()}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default App;
+export default Dashboard;

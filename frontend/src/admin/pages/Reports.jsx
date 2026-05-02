@@ -1,471 +1,176 @@
 import React, { useState, useEffect } from 'react';
 
 const Reports = () => {
-  const [sidebarActive, setSidebarActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [reports] = useState([
-    {
-      id: 'student-enrollment',
-      title: 'Student Enrollment Report',
-      description: 'Comprehensive report on student enrollment statistics, demographics, and trends by department and semester.',
-      icon: 'fa-users',
-      lastRun: 'Mar 12, 2024',
-      size: '15.2 MB'
-    },
-    {
-      id: 'academic-performance',
-      title: 'Academic Performance',
-      description: 'Detailed analysis of student grades, GPA distribution, pass/fail rates, and academic performance trends.',
-      icon: 'fa-chart-bar',
-      lastRun: 'Mar 13, 2024',
-      size: '8.7 MB'
-    },
-    {
-      id: 'graduation-analysis',
-      title: 'Graduation Analysis',
-      description: 'Graduation rates, time-to-degree analysis, and post-graduation outcomes by program and demographic.',
-      icon: 'fa-graduation-cap',
-      lastRun: 'Mar 10, 2024',
-      size: '12.5 MB'
-    },
-    {
-      id: 'course-evaluation',
-      title: 'Course Evaluation',
-      description: 'Course enrollment statistics, student evaluations, instructor ratings, and course effectiveness analysis.',
-      icon: 'fa-book',
-      lastRun: 'Mar 14, 2024',
-      size: '6.3 MB'
-    },
-    {
-      id: 'financial-report',
-      title: 'Financial Report',
-      description: 'Tuition revenue, fee collection, financial aid distribution, and departmental budget utilization analysis.',
-      icon: 'fa-dollar-sign',
-      lastRun: 'Mar 1, 2024',
-      size: '22.8 MB'
-    },
-    {
-      id: 'security-audit',
-      title: 'Security Audit Report',
-      description: 'System access logs, security incidents, compliance violations, and risk assessment analysis.',
-      icon: 'fa-shield-alt',
-      lastRun: 'Mar 13, 2024',
-      size: '18.4 MB'
-    },
-    {
-      id: 'faculty-workload',
-      title: 'Faculty Workload Analysis',
-      description: 'Teaching load distribution, research productivity, committee assignments, and faculty performance metrics.',
-      icon: 'fa-user-tie',
-      lastRun: 'Mar 11, 2024',
-      size: '9.1 MB'
-    },
-    {
-      id: 'system-usage',
-      title: 'System Usage Analytics',
-      description: 'Platform usage statistics, peak load times, user engagement metrics, and system performance analysis.',
-      icon: 'fa-chart-line',
-      lastRun: 'Today',
-      size: '4.2 MB'
-    }
-  ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [generatingId, setGeneratingId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    type: 'student-enrollment',
+    config: {}
+  });
 
-  const [recentExports] = useState([
-    { name: 'Student Enrollment Report', format: 'PDF', date: 'Mar 14, 2024', status: 'Completed', statusColor: 'success' },
-    { name: 'Academic Performance', format: 'Excel', date: 'Mar 13, 2024', status: 'Completed', statusColor: 'success' },
-    { name: 'Financial Report', format: 'CSV', date: 'Mar 12, 2024', status: 'Processing', statusColor: 'warning' }
-  ]);
-
-  const stats = [
-    { number: '42', label: 'Report Templates' },
-    { number: '156', label: 'Exports This Month' },
-    { number: '85%', label: 'Automated Reports' },
-    { number: '12', label: 'Scheduled Reports' }
-  ];
-
-  const handleCreateCustomReport = () => {
-    alert('Create Custom Report:\n\nReport type selection\nData source configuration\nFilter criteria\nColumn selection\nFormatting options\nSchedule settings');
-  };
-
-  const handleScheduleReport = () => {
-    alert('Schedule Report:\n\nFrequency selection\nRecipient configuration\nFormat preferences\nDelivery method\nAutomation settings\nNotification options');
-  };
-
-  const handleExportReport = (report, format) => {
-    alert(`Exporting ${report} as ${format.toUpperCase()}\n\nProcessing...\nFile will download automatically when ready.`);
-  };
-
-  const handlePreviewReport = (report) => {
-    alert(`Preview Report: ${report}\n\nInteractive preview\nData validation\nFormatting review\nPage layout\nExport options`);
-  };
-
-  const handleToggleNotifications = () => {
-    alert('Notifications:\n1. 5 reports ready for download\n2. Scheduled report completed\n3. Export queue status\n4. Custom report approval');
-  };
-
-  const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      alert('Logging out...');
+  // Fetch reports
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/admin/reports');
+      if (response.ok) {
+        const data = await response.json();
+        setReports(data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Filter reports based on search
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  // Create report
+  const createReport = async () => {
+    if (!formData.title) {
+      alert('Please enter report title');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/admin/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert('Report created successfully!');
+        setShowAddModal(false);
+        setFormData({ title: '', description: '', type: 'student-enrollment', config: {} });
+        fetchReports();
+      } else {
+        alert('Failed to create report');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  };
+
+  // Update report
+  const updateReport = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/reports/${selectedReport.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert('Report updated successfully!');
+        setShowEditModal(false);
+        setFormData({ title: '', description: '', type: 'student-enrollment', config: {} });
+        fetchReports();
+      } else {
+        alert('Failed to update report');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  };
+
+  // Delete report
+  const deleteReport = async (id) => {
+    if (window.confirm('Delete this report?')) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/admin/reports/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          alert('Report deleted successfully!');
+          fetchReports();
+        } else {
+          alert('Failed to delete report');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+  };
+
+  // Generate report
+  const generateReport = async (id, format) => {
+    setGeneratingId(id);
+    try {
+      const response = await fetch(`http://localhost:5000/api/admin/reports/${id}/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ format })
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(`Report generated successfully in ${format.toUpperCase()} format!`);
+      } else {
+        alert('Failed to generate report');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
+  const openEditModal = (report) => {
+    setSelectedReport(report);
+    setFormData({
+      title: report.title,
+      description: report.description || '',
+      type: report.type,
+      config: report.config || {}
+    });
+    setShowEditModal(true);
+  };
+
+  const getIconForType = (type) => {
+    const icons = {
+      'student-enrollment': 'fa-users',
+      'academic-performance': 'fa-chart-bar',
+      'graduation-analysis': 'fa-graduation-cap',
+      'course-evaluation': 'fa-book',
+      'faculty-workload': 'fa-user-tie',
+      'security-audit': 'fa-shield-alt',
+      'system-usage': 'fa-chart-line'
+    };
+    return icons[type] || 'fa-file-alt';
+  };
+
+  // Filter reports
   const filteredReports = reports.filter(report =>
-    report.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.description.toLowerCase().includes(searchTerm.toLowerCase())
+    report.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Update mobile styles on resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 992) {
-        const toggle = document.querySelector('.mobile-toggle-style');
-        if (toggle) toggle.style.display = 'flex';
-      } else {
-        const toggle = document.querySelector('.mobile-toggle-style');
-        if (toggle) toggle.style.display = 'none';
-        setSidebarActive(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Pagination
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedReports = filteredReports.slice(startIndex, startIndex + itemsPerPage);
 
   const styles = {
     container: {
       minHeight: '100vh',
+      background: '#0a0a15',
       fontFamily: "'Inter', sans-serif",
-      position: 'relative'
-    },
-    background: {
-      position: 'fixed',
-      width: '100%',
-      height: '100%',
-      background: 'radial-gradient(ellipse at 10% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%), radial-gradient(ellipse at 90% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%), linear-gradient(180deg, #0a0a15 0%, #0f0f1e 50%, #1a1a2e 100%)',
-      zIndex: -2
-    },
-    orb1: {
-      position: 'fixed',
-      width: '800px',
-      height: '800px',
-      background: 'radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)',
-      top: '-30%',
-      left: '-20%',
-      borderRadius: '50%',
-      filter: 'blur(120px)',
-      opacity: 0.15,
-      animation: 'orbFloat 25s ease-in-out infinite',
-      zIndex: -1
-    },
-    orb2: {
-      position: 'fixed',
-      width: '600px',
-      height: '600px',
-      background: 'radial-gradient(circle, rgba(118, 75, 162, 0.12) 0%, transparent 70%)',
-      bottom: '-20%',
-      right: '-15%',
-      borderRadius: '50%',
-      filter: 'blur(120px)',
-      opacity: 0.15,
-      animation: 'orbFloat 25s ease-in-out infinite',
-      animationDelay: '-12s',
-      zIndex: -1
-    },
-    sidebar: {
-      width: '280px',
-      background: 'rgba(255, 255, 255, 0.03)',
-      backdropFilter: 'blur(20px)',
-      borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-      padding: '30px 0',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'fixed',
-      height: '100vh',
-      zIndex: 100,
-      transition: 'transform 0.3s ease',
-      transform: sidebarActive ? 'translateX(0)' : 'translateX(-100%)'
-    },
-    mainContent: {
-      flex: 1,
-      marginLeft: '280px',
-      padding: '30px',
-      transition: 'margin-left 0.3s ease'
-    },
-    mobileMenuToggle: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      width: '50px',
-      height: '50px',
-      borderRadius: '14px',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '22px',
-      color: 'white',
-      cursor: 'pointer',
-      position: 'fixed',
-      top: '20px',
-      left: '20px',
-      zIndex: 1000,
-      display: 'none'
-    },
-    statCard: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '16px',
-      padding: '24px'
-    },
-    systemOverview: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '24px',
-      padding: '32px',
-      marginBottom: '30px'
-    },
-    reportCard: {
-      background: 'rgba(255, 255, 255, 0.03)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '16px',
-      padding: '24px',
-      transition: 'all 0.3s',
-      cursor: 'pointer'
-    },
-    btnPrimary: {
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: 600,
-      fontSize: '14px',
-      cursor: 'pointer',
-      border: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      fontFamily: "'Inter', sans-serif"
-    },
-    btnSecondary: {
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: 600,
-      fontSize: '14px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      fontFamily: "'Inter', sans-serif"
-    },
-    exportBtn: {
-      padding: '8px 12px',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '8px',
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '12px',
-      cursor: 'pointer',
-      transition: 'all 0.3s',
-      fontFamily: "'Inter', sans-serif"
-    },
-    navItem: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '15px',
-      padding: '16px 20px',
-      color: 'rgba(255, 255, 255, 0.6)',
-      textDecoration: 'none',
-      borderRadius: '14px',
-      marginBottom: '8px',
-      transition: 'all 0.3s ease',
-      fontWeight: 500,
-      cursor: 'pointer'
-    },
-    logoContainer: {
-      padding: '0 30px 40px',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-      marginBottom: '30px'
-    },
-    logo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '15px'
-    },
-    logoIcon: {
-      width: '42px',
-      height: '42px',
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      borderRadius: '12px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '24px',
-      boxShadow: '0 6px 20px rgba(102, 126, 234, 0.3)'
-    },
-    logoTextH2: {
-      fontSize: '24px',
-      fontWeight: 800,
-      color: 'white',
-      marginBottom: '4px',
-      letterSpacing: '-0.5px'
-    },
-    logoTextSpan: {
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
-    },
-    logoTextP: {
-      fontSize: '12px',
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontWeight: 500
-    },
-    userProfile: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '15px',
-      padding: '20px',
-      background: 'rgba(255, 255, 255, 0.05)',
-      borderRadius: '16px',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
-    },
-    avatar: {
-      width: '50px',
-      height: '50px',
-      borderRadius: '50%',
-      background: 'linear-gradient(135deg, #ef4444, #f87171)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '22px',
-      fontWeight: 600,
       color: 'white'
     },
-    userInfoH4: {
-      fontSize: '16px',
-      fontWeight: 700,
-      marginBottom: '4px',
-      color: 'white'
-    },
-    userInfoP: {
-      fontSize: '13px',
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontWeight: 500
-    },
-    logoutBtn: {
-      width: '100%',
-      marginTop: '20px',
-      padding: '14px',
-      background: 'rgba(239, 68, 68, 0.1)',
-      border: '1px solid rgba(239, 68, 68, 0.2)',
-      color: '#ef4444',
-      borderRadius: '14px',
-      fontWeight: 600,
-      cursor: 'pointer',
-      transition: 'all 0.3s',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '10px',
-      fontFamily: "'Inter', sans-serif"
-    },
-    topBar: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '40px',
-      flexWrap: 'wrap',
-      gap: '20px'
-    },
-    pageTitleH1: {
-      fontSize: '32px',
-      fontWeight: 800,
-      color: 'white',
-      marginBottom: '8px'
-    },
-    pageTitleP: {
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '15px'
-    },
-    topBarActions: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '20px'
-    },
-    notificationBtn: {
-      position: 'relative',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      width: '48px',
-      height: '48px',
-      borderRadius: '14px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: 'white',
-      fontSize: '20px',
-      cursor: 'pointer',
-      transition: 'all 0.3s'
-    },
-    notificationBadge: {
-      position: 'absolute',
-      top: '-5px',
-      right: '-5px',
-      background: '#ef4444',
-      color: 'white',
-      fontSize: '12px',
-      fontWeight: 700,
-      width: '20px',
-      height: '20px',
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    searchBar: {
-      position: 'relative',
-      width: '300px'
-    },
-    searchInput: {
-      width: '100%',
-      padding: '16px 20px 16px 50px',
-      background: 'rgba(255, 255, 255, 0.05)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '14px',
-      color: 'white',
-      fontSize: '15px',
-      fontFamily: "'Inter', sans-serif"
-    },
-    searchIcon: {
-      position: 'absolute',
-      left: '20px',
-      top: '50%',
-      transform: 'translateY(-50%)',
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '18px'
-    },
-    statsGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: '20px',
-      marginBottom: '30px'
-    },
-    statNumber: {
-      fontSize: '36px',
-      fontWeight: 800,
-      marginBottom: '8px',
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text'
-    },
-    statLabel: {
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '14px'
-    },
-    sectionHeader: {
+    header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -473,288 +178,506 @@ const Reports = () => {
       flexWrap: 'wrap',
       gap: '15px'
     },
-    sectionHeaderH2: {
-      fontSize: '24px',
+    pageTitle: {
+      fontSize: '28px',
       fontWeight: 700,
-      color: 'white'
+      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      marginBottom: '4px'
     },
-    sectionActions: {
+    pageSubtitle: {
+      color: '#94a3b8',
+      fontSize: '14px'
+    },
+    createButton: {
+      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+      color: 'white',
+      border: 'none',
+      padding: '10px 20px',
+      borderRadius: '10px',
+      fontWeight: 500,
+      cursor: 'pointer',
       display: 'flex',
-      gap: '12px'
+      alignItems: 'center',
+      gap: '8px'
+    },
+    statsGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(4, 1fr)',
+      gap: '20px',
+      marginBottom: '30px'
+    },
+    statCard: {
+      background: '#1a1a2e',
+      borderRadius: '16px',
+      padding: '20px',
+      textAlign: 'center',
+      border: '1px solid rgba(255,255,255,0.05)'
+    },
+    statValue: {
+      fontSize: '28px',
+      fontWeight: 700,
+      color: '#667eea'
+    },
+    statLabel: {
+      fontSize: '13px',
+      color: '#94a3b8',
+      marginTop: '4px'
+    },
+    filters: {
+      display: 'flex',
+      gap: '12px',
+      marginBottom: '20px',
+      flexWrap: 'wrap',
+      alignItems: 'center'
+    },
+    searchWrapper: {
+      position: 'relative'
+    },
+    searchIcon: {
+      position: 'absolute',
+      left: '12px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      color: '#667eea',
+      fontSize: '12px'
+    },
+    searchInput: {
+      padding: '10px 12px 10px 32px',
+      background: '#1a1a2e',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '10px',
+      color: 'white',
+      width: '250px',
+      outline: 'none'
+    },
+    clearButton: {
+      background: '#1a1a2e',
+      border: '1px solid rgba(102,126,234,0.3)',
+      color: 'white',
+      padding: '10px 20px',
+      borderRadius: '10px',
+      cursor: 'pointer'
+    },
+    reportsContainer: {
+      background: '#1a1a2e',
+      borderRadius: '20px',
+      padding: '24px',
+      border: '1px solid rgba(255,255,255,0.05)'
+    },
+    sectionTitle: {
+      fontSize: '18px',
+      fontWeight: 600,
+      marginBottom: '20px',
+      color: 'white'
     },
     reportsGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-      gap: '20px',
-      marginTop: '30px'
+      gap: '20px'
+    },
+    reportCard: {
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.05)',
+      borderRadius: '16px',
+      padding: '20px',
+      transition: 'all 0.3s'
     },
     reportIcon: {
-      width: '60px',
-      height: '60px',
+      width: '50px',
+      height: '50px',
       borderRadius: '12px',
       background: 'linear-gradient(135deg, #667eea, #764ba2)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '24px',
+      fontSize: '22px',
       color: 'white',
-      marginBottom: '20px'
-    },
-    reportTitle: {
-      fontSize: '18px',
-      fontWeight: 700,
-      marginBottom: '10px',
-      color: 'white'
-    },
-    reportDescription: {
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '14px',
-      marginBottom: '20px',
-      lineHeight: 1.5
-    },
-    reportMeta: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      color: 'rgba(255, 255, 255, 0.6)',
-      fontSize: '12px',
       marginBottom: '15px'
     },
-    exportOptions: {
+    reportTitle: {
+      fontSize: '16px',
+      fontWeight: 600,
+      color: 'white',
+      marginBottom: '8px'
+    },
+    reportDescription: {
+      color: '#94a3b8',
+      fontSize: '13px',
+      marginBottom: '12px',
+      lineHeight: 1.4
+    },
+    reportType: {
+      fontSize: '11px',
+      color: '#94a3b8',
+      marginBottom: '12px'
+    },
+    actionButtons: {
+      display: 'flex',
+      gap: '8px',
+      flexWrap: 'wrap'
+    },
+    exportBtn: {
+      padding: '6px 10px',
+      background: '#1a1a2e',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '6px',
+      color: '#94a3b8',
+      fontSize: '11px',
+      cursor: 'pointer'
+    },
+    editBtn: {
+      padding: '6px 10px',
+      background: 'rgba(59,130,246,0.15)',
+      border: '1px solid rgba(59,130,246,0.3)',
+      borderRadius: '6px',
+      color: '#3b82f6',
+      fontSize: '11px',
+      cursor: 'pointer'
+    },
+    deleteBtn: {
+      padding: '6px 10px',
+      background: 'rgba(239,68,68,0.15)',
+      border: '1px solid rgba(239,68,68,0.3)',
+      borderRadius: '6px',
+      color: '#ef4444',
+      fontSize: '11px',
+      cursor: 'pointer'
+    },
+    pagination: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: '24px',
+      paddingTop: '16px',
+      borderTop: '1px solid rgba(255,255,255,0.05)'
+    },
+    paginationText: {
+      color: '#94a3b8',
+      fontSize: '13px'
+    },
+    paginationButtons: {
       display: 'flex',
       gap: '8px'
     },
-    recentExportsContainer: {
-      marginTop: '40px'
+    pageButton: {
+      padding: '8px 16px',
+      background: '#1a1a2e',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '8px',
+      color: '#94a3b8',
+      cursor: 'pointer'
     },
-    recentExportsTitle: {
-      marginBottom: '20px',
-      fontSize: '18px'
+    activePageButton: {
+      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+      color: 'white',
+      border: 'none'
     },
-    recentExportsTable: {
-      background: 'rgba(255, 255, 255, 0.03)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '12px',
-      padding: '20px'
+    modalOverlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.8)',
+      backdropFilter: 'blur(10px)',
+      zIndex: 1000,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     },
-    tableHeader: {
-      display: 'grid',
-      gridTemplateColumns: '2fr 1fr 1fr 1fr',
-      gap: '15px',
-      padding: '12px',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    modalContent: {
+      background: '#1a1a2e',
+      borderRadius: '20px',
+      padding: '28px',
+      width: '500px',
+      maxWidth: '90%',
+      border: '1px solid rgba(102,126,234,0.3)'
+    },
+    modalTitle: {
+      fontSize: '22px',
       fontWeight: 600,
-      color: 'rgba(255, 255, 255, 0.6)'
+      color: 'white',
+      marginBottom: '20px'
     },
-    tableRow: {
-      display: 'grid',
-      gridTemplateColumns: '2fr 1fr 1fr 1fr',
-      gap: '15px',
-      padding: '12px'
+    modalHeader: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '20px'
     },
-    statusSuccess: {
-      color: '#10b981'
+    closeModal: {
+      background: 'none',
+      border: 'none',
+      color: '#94a3b8',
+      fontSize: '24px',
+      cursor: 'pointer'
     },
-    statusWarning: {
-      color: '#f59e0b'
+    formGroup: {
+      marginBottom: '16px'
+    },
+    formLabel: {
+      display: 'block',
+      marginBottom: '8px',
+      color: '#94a3b8',
+      fontSize: '13px'
+    },
+    formInput: {
+      width: '100%',
+      padding: '12px',
+      background: '#0a0a15',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '10px',
+      color: 'white',
+      outline: 'none'
+    },
+    formTextarea: {
+      width: '100%',
+      padding: '12px',
+      background: '#0a0a15',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '10px',
+      color: 'white',
+      resize: 'vertical',
+      outline: 'none'
+    },
+    formSelect: {
+      width: '100%',
+      padding: '12px',
+      background: '#0a0a15',
+      border: '1px solid rgba(102,126,234,0.3)',
+      borderRadius: '10px',
+      color: 'white',
+      outline: 'none'
+    },
+    modalButtons: {
+      display: 'flex',
+      gap: '12px',
+      justifyContent: 'flex-end',
+      marginTop: '24px'
+    },
+    cancelButton: {
+      padding: '10px 20px',
+      background: 'transparent',
+      border: '1px solid rgba(255,255,255,0.2)',
+      borderRadius: '10px',
+      color: '#94a3b8',
+      cursor: 'pointer'
+    },
+    submitButton: {
+      padding: '10px 20px',
+      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+      border: 'none',
+      borderRadius: '10px',
+      color: 'white',
+      cursor: 'pointer',
+      fontWeight: 500
     }
   };
 
-  // Add animation keyframes to document
-  useEffect(() => {
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = `
-      @keyframes orbFloat {
-        0%, 100% { transform: translate(0,0) scale(1) rotate(0deg); }
-        25% { transform: translate(5%,-5%) scale(1.2) rotate(90deg); }
-        50% { transform: translate(-5%,5%) scale(0.9) rotate(180deg); }
-        75% { transform: translate(3%,-3%) scale(1.1) rotate(270deg); }
-      }
-      @media (max-width: 992px) {
-        .main-content-margin { margin-left: 0 !important; }
-        .stats-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; }
-      }
-      @media (max-width: 768px) {
-        .stats-grid-responsive { grid-template-columns: 1fr !important; }
-        .reports-grid-responsive { grid-template-columns: 1fr !important; }
-        .table-header-responsive, .table-row-responsive { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-  }, []);
+  const totalReports = reports.length;
+  const activeReports = reports.filter(r => r.is_active === 1).length;
+
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <div style={{ color: '#94a3b8' }}>Loading reports...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
-      <div style={styles.background}></div>
-      <div style={styles.orb1}></div>
-      <div style={styles.orb2}></div>
-
-      {/* Mobile Menu Toggle */}
-      <div
-        className="mobile-toggle-style"
-        style={styles.mobileMenuToggle}
-        onClick={() => setSidebarActive(!sidebarActive)}
-      >
-        <i className="fas fa-bars"></i>
+      {/* Header */}
+      <div style={styles.header}>
+        <div>
+          <h1 style={styles.pageTitle}>Reports & Export</h1>
+          <p style={styles.pageSubtitle}>Generate reports and export system data</p>
+        </div>
+        <button onClick={() => setShowAddModal(true)} style={styles.createButton}>
+          <i className="fas fa-plus"></i> Create Report
+        </button>
       </div>
 
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
-        {/* Sidebar */}
-        <aside style={styles.sidebar}>
-          <div style={styles.logoContainer}>
-            <div style={styles.logo}>
-              <div style={styles.logoIcon}>⚙️</div>
-              <div>
-                <h2 style={styles.logoTextH2}>SWE<span style={styles.logoTextSpan}>Hub</span></h2>
-                <p style={styles.logoTextP}>Admin Dashboard</p>
-              </div>
-            </div>
-          </div>
+      {/* Stats Cards */}
+      <div style={styles.statsGrid}>
+        <div style={styles.statCard}>
+          <div style={styles.statValue}>{totalReports}</div>
+          <div style={styles.statLabel}>Total Reports</div>
+        </div>
+        <div style={styles.statCard}>
+          <div style={styles.statValue}>{activeReports}</div>
+          <div style={styles.statLabel}>Active Reports</div>
+        </div>
+        <div style={styles.statCard}>
+          <div style={styles.statValue}>85%</div>
+          <div style={styles.statLabel}>Automated</div>
+        </div>
+        <div style={styles.statCard}>
+          <div style={styles.statValue}>12</div>
+          <div style={styles.statLabel}>Scheduled</div>
+        </div>
+      </div>
 
-          <nav style={{ flex: 1, padding: '0 20px' }}>
-            {[
-              { name: 'Dashboard', icon: 'fa-home', active: false },
-              { name: 'User Management', icon: 'fa-users', active: false },
-              { name: 'Student Records', icon: 'fa-graduation-cap', active: false },
-              { name: 'Faculty Management', icon: 'fa-chalkboard-teacher', active: false },
-              { name: 'Results & Grades', icon: 'fa-chart-bar', active: false },
-              { name: 'Course Catalog', icon: 'fa-book', active: false },
-              { name: 'Academic Calendar', icon: 'fa-calendar-alt', active: false },
-              { name: 'System Settings', icon: 'fa-cogs', active: false },
-              { name: 'Security & Logs', icon: 'fa-shield-alt', active: false },
-              { name: 'Reports & Export', icon: 'fa-file-export', active: true }
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  ...styles.navItem,
-                  background: item.active ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'transparent',
-                  color: item.active ? 'white' : 'rgba(255,255,255,0.6)',
-                  boxShadow: item.active ? '0 6px 20px rgba(102,126,234,0.3)' : 'none'
-                }}
-                onClick={() => alert(`Navigate to ${item.name}`)}
+      {/* Filters */}
+      <div style={styles.filters}>
+        <div style={styles.searchWrapper}>
+          <i className="fas fa-search" style={styles.searchIcon}></i>
+          <input type="text" placeholder="Search reports..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={styles.searchInput} />
+        </div>
+        <button onClick={() => { setSearchTerm(''); setCurrentPage(1); }} style={styles.clearButton}>
+          <i className="fas fa-filter"></i> Clear Filters
+        </button>
+      </div>
+
+      {/* Reports Grid */}
+      <div style={styles.reportsContainer}>
+        <h2 style={styles.sectionTitle}>Available Reports</h2>
+        
+        {reports.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+            <i className="fas fa-file-alt" style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}></i>
+            <p>No reports available. Click "Create Report" to add one.</p>
+          </div>
+        ) : (
+          <div style={styles.reportsGrid}>
+            {paginatedReports.map((report) => (
+              <div key={report.id} style={styles.reportCard}>
+                <div style={styles.reportIcon}>
+                  <i className={`fas ${getIconForType(report.type)}`}></i>
+                </div>
+                <div style={styles.reportTitle}>{report.title}</div>
+                <div style={styles.reportDescription}>{report.description || 'No description available'}</div>
+                <div style={styles.reportType}>Type: {report.type}</div>
+                <div style={styles.actionButtons}>
+                  <button style={styles.exportBtn} onClick={() => generateReport(report.id, 'pdf')} disabled={generatingId === report.id}>PDF</button>
+                  <button style={styles.exportBtn} onClick={() => generateReport(report.id, 'excel')} disabled={generatingId === report.id}>Excel</button>
+                  <button style={styles.exportBtn} onClick={() => generateReport(report.id, 'csv')} disabled={generatingId === report.id}>CSV</button>
+                  <button style={styles.editBtn} onClick={() => openEditModal(report)}>Edit</button>
+                  <button style={styles.deleteBtn} onClick={() => deleteReport(report.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={styles.pagination}>
+            <div style={styles.paginationText}>
+              Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredReports.length)} of {filteredReports.length} reports
+            </div>
+            <div style={styles.paginationButtons}>
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p-1))} 
+                disabled={currentPage === 1}
+                style={currentPage === 1 ? { ...styles.pageButton, opacity: 0.5, cursor: 'not-allowed' } : styles.pageButton}
               >
-                <i className={`fas ${item.icon}`} style={{ fontSize: '20px', width: '24px', textAlign: 'center' }}></i>
-                <span>{item.name}</span>
-              </div>
-            ))}
-          </nav>
-
-          <div style={{ padding: '30px 30px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={styles.userProfile}>
-              <div style={styles.avatar}>AD</div>
-              <div>
-                <h4 style={styles.userInfoH4}>Admin Officer</h4>
-                <p style={styles.userInfoP}>System Administrator</p>
-              </div>
-            </div>
-            <button onClick={handleLogout} style={styles.logoutBtn}>
-              <i className="fas fa-sign-out-alt"></i><span>Logout</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="main-content-margin" style={styles.mainContent}>
-          {/* Top Bar */}
-          <div style={styles.topBar}>
-            <div>
-              <h1 style={styles.pageTitleH1}>Reports & Export</h1>
-              <p style={styles.pageTitleP}>
-                Generate reports and export system data - {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </p>
-            </div>
-            <div style={styles.topBarActions}>
-              <div style={styles.notificationBtn} onClick={handleToggleNotifications}>
-                <i className="fas fa-bell"></i>
-                <span style={styles.notificationBadge}>5</span>
-              </div>
-              <div style={styles.searchBar}>
-                <i className="fas fa-search" style={styles.searchIcon}></i>
-                <input
-                  type="text"
-                  placeholder="Search reports..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={styles.searchInput}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="stats-grid-responsive" style={styles.statsGrid}>
-            {stats.map((stat, idx) => (
-              <div key={idx} style={styles.statCard}>
-                <div style={styles.statNumber}>{stat.number}</div>
-                <div style={styles.statLabel}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Reports Section */}
-          <div style={styles.systemOverview}>
-            <div style={styles.sectionHeader}>
-              <h2 style={styles.sectionHeaderH2}>Available Reports</h2>
-              <div style={styles.sectionActions}>
-                <button style={styles.btnPrimary} onClick={handleCreateCustomReport}>
-                  <i className="fas fa-plus-circle"></i>Custom Report
-                </button>
-                <button style={styles.btnSecondary} onClick={handleScheduleReport}>
-                  <i className="fas fa-clock"></i>Schedule Report
-                </button>
-              </div>
-            </div>
-
-            <div className="reports-grid-responsive" style={styles.reportsGrid}>
-              {filteredReports.map((report) => (
-                <div
-                  key={report.id}
-                  style={styles.reportCard}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                Previous
+              </button>
+              {[1, 2, 3].filter(p => p <= totalPages).map(pageNum => (
+                <button 
+                  key={pageNum} 
+                  onClick={() => setCurrentPage(pageNum)} 
+                  style={currentPage === pageNum ? styles.activePageButton : styles.pageButton}
                 >
-                  <div style={styles.reportIcon}>
-                    <i className={`fas ${report.icon}`}></i>
-                  </div>
-                  <div style={styles.reportTitle}>{report.title}</div>
-                  <div style={styles.reportDescription}>{report.description}</div>
-                  <div style={styles.reportMeta}>
-                    <span>Last run: {report.lastRun}</span>
-                    <span>{report.size}</span>
-                  </div>
-                  <div style={styles.exportOptions}>
-                    <button style={styles.exportBtn} onClick={() => handleExportReport(report.title, 'pdf')}>PDF</button>
-                    <button style={styles.exportBtn} onClick={() => handleExportReport(report.title, 'excel')}>Excel</button>
-                    <button style={styles.exportBtn} onClick={() => handleExportReport(report.title, 'csv')}>CSV</button>
-                    <button style={styles.exportBtn} onClick={() => handlePreviewReport(report.title)}>Preview</button>
-                  </div>
-                </div>
+                  {pageNum}
+                </button>
               ))}
-            </div>
-
-            {/* Recent Exports Section */}
-            <div style={styles.recentExportsContainer}>
-              <h3 style={styles.recentExportsTitle}>Recent Exports</h3>
-              <div style={styles.recentExportsTable}>
-                <div className="table-header-responsive" style={styles.tableHeader}>
-                  <div>Report Name</div>
-                  <div>Format</div>
-                  <div>Date</div>
-                  <div>Status</div>
-                </div>
-                {recentExports.map((export_, idx) => (
-                  <div key={idx} className="table-row-responsive" style={{ ...styles.tableRow, borderBottom: idx < recentExports.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                    <div>{export_.name}</div>
-                    <div>{export_.format}</div>
-                    <div>{export_.date}</div>
-                    <div><span style={export_.statusColor === 'success' ? styles.statusSuccess : styles.statusWarning}>{export_.status}</span></div>
-                  </div>
-                ))}
-              </div>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} 
+                disabled={currentPage === totalPages}
+                style={currentPage === totalPages ? { ...styles.pageButton, opacity: 0.5, cursor: 'not-allowed' } : styles.pageButton}
+              >
+                Next
+              </button>
             </div>
           </div>
-        </main>
+        )}
       </div>
+
+      {/* Add Report Modal */}
+      {showAddModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Create New Report</h2>
+              <button style={styles.closeModal} onClick={() => setShowAddModal(false)}>×</button>
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Title *</label>
+              <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} placeholder="Enter report title" style={styles.formInput} />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Description</label>
+              <textarea rows="3" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Enter description" style={styles.formTextarea} />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Report Type</label>
+              <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} style={styles.formSelect}>
+                <option value="student-enrollment">Student Enrollment</option>
+                <option value="academic-performance">Academic Performance</option>
+                <option value="graduation-analysis">Graduation Analysis</option>
+                <option value="course-evaluation">Course Evaluation</option>
+                <option value="faculty-workload">Faculty Workload</option>
+                <option value="security-audit">Security Audit</option>
+                <option value="system-usage">System Usage</option>
+              </select>
+            </div>
+            
+            <div style={styles.modalButtons}>
+              <button onClick={() => setShowAddModal(false)} style={styles.cancelButton}>Cancel</button>
+              <button onClick={createReport} style={styles.submitButton}>Create Report</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Report Modal */}
+      {showEditModal && selectedReport && (
+        <div style={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
+          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Edit Report</h2>
+              <button style={styles.closeModal} onClick={() => setShowEditModal(false)}>×</button>
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Title</label>
+              <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} style={styles.formInput} />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Description</label>
+              <textarea rows="3" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} style={styles.formTextarea} />
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>Report Type</label>
+              <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} style={styles.formSelect}>
+                <option value="student-enrollment">Student Enrollment</option>
+                <option value="academic-performance">Academic Performance</option>
+                <option value="graduation-analysis">Graduation Analysis</option>
+                <option value="course-evaluation">Course Evaluation</option>
+                <option value="faculty-workload">Faculty Workload</option>
+                <option value="security-audit">Security Audit</option>
+                <option value="system-usage">System Usage</option>
+              </select>
+            </div>
+            
+            <div style={styles.modalButtons}>
+              <button onClick={() => setShowEditModal(false)} style={styles.cancelButton}>Cancel</button>
+              <button onClick={updateReport} style={styles.submitButton}>Update Report</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
