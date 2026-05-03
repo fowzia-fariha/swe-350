@@ -163,7 +163,7 @@ function Dashboard() {
             <p className="card-description">Check today's schedule and fixed class routines</p>
           </div>
 
-          <div className="dashboard-card" onClick={() => handleCardClick('results.html')}>
+          <div className="dashboard-card" onClick={() => handleCardClick('/results')}>
             <div className="card-icon">📊</div>
             <h3 className="card-title">Results</h3>
             <p className="card-description">View your semester results and academic performance</p>
