@@ -10,15 +10,19 @@ const UserManagement = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '', role: 'student' });
+  const [formData, setFormData] = useState({ name: '', email: '', role: 'student', password: '' });
 
   // Fetch users from backend
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await fetch('http://localhost:5000/api/admin/users');
-      const data = await response.json();
-      setUsers(data);
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        console.error('Failed to fetch users');
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -41,16 +45,22 @@ const UserManagement = () => {
       const response = await fetch('http://localhost:5000/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          password: formData.password || 'temp123'
+        })
       });
 
       if (response.ok) {
         alert('User added successfully!');
         setShowAddModal(false);
-        setFormData({ name: '', email: '', role: 'student' });
+        setFormData({ name: '', email: '', role: 'student', password: '' });
         fetchUsers();
       } else {
-        alert('Failed to add user');
+        const error = await response.json();
+        alert(`Failed to add user: ${error.error}`);
       }
     } catch (error) {
       alert('Error: ' + error.message);
@@ -59,16 +69,16 @@ const UserManagement = () => {
 
   // Delete user
   const deleteUser = async (userId) => {
-    if (window.confirm('Delete this user?')) {
+    if (window.confirm('Delete this user? This action cannot be undone.')) {
       try {
         const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
           method: 'DELETE'
         });
         if (response.ok) {
-          alert('User deleted!');
+          alert('User deleted successfully!');
           fetchUsers();
         } else {
-          alert('Failed to delete');
+          alert('Failed to delete user');
         }
       } catch (error) {
         alert('Error: ' + error.message);
@@ -82,13 +92,16 @@ const UserManagement = () => {
       const response = await fetch(`http://localhost:5000/api/admin/users/${selectedUser.user_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name, email: formData.email, is_active: 1 })
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email
+        })
       });
 
       if (response.ok) {
         alert('User updated successfully!');
         setShowEditModal(false);
-        setFormData({ name: '', email: '', role: 'student' });
+        setFormData({ name: '', email: '', role: 'student', password: '' });
         fetchUsers();
       } else {
         alert('Failed to update user');
@@ -100,15 +113,20 @@ const UserManagement = () => {
 
   const openEditModal = (user) => {
     setSelectedUser(user);
-    setFormData({ name: user.name, email: user.email, role: user.role });
+    setFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      password: ''
+    });
     setShowEditModal(true);
   };
 
   // Stats
   const totalUsers = users.length;
-  const activeUsers = users.filter(u => u.is_active === 1).length;
   const facultyCount = users.filter(u => u.role === 'teacher').length;
   const adminCount = users.filter(u => u.role === 'admin').length;
+  const studentCount = users.filter(u => u.role === 'student').length;
 
   // Filter users
   const filteredUsers = users.filter(user => {
@@ -116,8 +134,7 @@ const UserManagement = () => {
                           user.user_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = !roleFilter || user.role === roleFilter;
-    const matchesStatus = !statusFilter || (statusFilter === 'active' && user.is_active === 1) || (statusFilter === 'inactive' && user.is_active === 0);
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesRole;
   });
 
   // Pagination
@@ -191,7 +208,8 @@ const UserManagement = () => {
       display: 'flex',
       gap: '12px',
       marginBottom: '20px',
-      flexWrap: 'wrap'
+      flexWrap: 'wrap',
+      alignItems: 'center'
     },
     searchWrapper: {
       position: 'relative'
@@ -250,22 +268,26 @@ const UserManagement = () => {
       padding: '12px',
       color: '#94a3b8',
       fontWeight: 500,
-      fontSize: '13px'
+      fontSize: '13px',
+      borderBottom: '1px solid rgba(255,255,255,0.1)'
     },
     td: {
       padding: '12px',
-      fontSize: '13px'
+      fontSize: '13px',
+      borderBottom: '1px solid rgba(255,255,255,0.05)'
     },
     tdName: {
       padding: '12px',
       fontSize: '13px',
       fontWeight: 500,
-      color: 'white'
+      color: 'white',
+      borderBottom: '1px solid rgba(255,255,255,0.05)'
     },
     tdEmail: {
       padding: '12px',
       fontSize: '13px',
-      color: '#94a3b8'
+      color: '#94a3b8',
+      borderBottom: '1px solid rgba(255,255,255,0.05)'
     },
     roleBadge: (role) => ({
       padding: '4px 12px',
@@ -274,14 +296,6 @@ const UserManagement = () => {
       fontWeight: 600,
       background: role === 'admin' ? 'rgba(239,68,68,0.15)' : role === 'teacher' ? 'rgba(16,185,129,0.15)' : 'rgba(59,130,246,0.15)',
       color: role === 'admin' ? '#ef4444' : role === 'teacher' ? '#10b981' : '#3b82f6'
-    }),
-    statusBadge: (isActive) => ({
-      padding: '4px 12px',
-      borderRadius: '20px',
-      fontSize: '11px',
-      fontWeight: 600,
-      background: isActive === 1 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-      color: isActive === 1 ? '#10b981' : '#ef4444'
     }),
     editButton: {
       background: 'rgba(59,130,246,0.15)',
@@ -427,8 +441,8 @@ const UserManagement = () => {
           <div style={styles.statLabel}>Total Users</div>
         </div>
         <div style={styles.statCard}>
-          <div style={styles.statValue}>{activeUsers}</div>
-          <div style={styles.statLabel}>Active Users</div>
+          <div style={styles.statValue}>{studentCount}</div>
+          <div style={styles.statLabel}>Students</div>
         </div>
         <div style={styles.statCard}>
           <div style={styles.statValue}>{facultyCount}</div>
@@ -444,7 +458,13 @@ const UserManagement = () => {
       <div style={styles.filters}>
         <div style={styles.searchWrapper}>
           <i className="fas fa-search" style={styles.searchIcon}></i>
-          <input type="text" placeholder="Search users..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={styles.searchInput} />
+          <input
+            type="text"
+            placeholder="Search by name, ID or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={styles.searchInput}
+          />
         </div>
         <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={styles.selectInput}>
           <option value="">All Roles</option>
@@ -452,12 +472,7 @@ const UserManagement = () => {
           <option value="teacher">Teacher</option>
           <option value="student">Student</option>
         </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={styles.selectInput}>
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <button onClick={() => { setRoleFilter(''); setStatusFilter(''); setSearchTerm(''); }} style={styles.clearButton}>
+        <button onClick={() => { setRoleFilter(''); setSearchTerm(''); setCurrentPage(1); }} style={styles.clearButton}>
           Clear Filters
         </button>
       </div>
@@ -465,7 +480,7 @@ const UserManagement = () => {
       {/* Users Table */}
       <div style={styles.tableContainer}>
         <h2 style={styles.tableTitle}>All Users</h2>
-        
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Loading users...</div>
         ) : (
@@ -477,7 +492,6 @@ const UserManagement = () => {
                   <th style={styles.th}>Name</th>
                   <th style={styles.th}>Email</th>
                   <th style={styles.th}>Role</th>
-                  <th style={styles.th}>Status</th>
                   <th style={styles.th}>Actions</th>
                 </tr>
               </thead>
@@ -493,11 +507,6 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td style={styles.td}>
-                      <span style={styles.statusBadge(user.is_active)}>
-                        {user.is_active === 1 ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td style={styles.td}>
                       <button onClick={() => openEditModal(user)} style={styles.editButton}>
                         <i className="fas fa-edit"></i> Edit
                       </button>
@@ -507,6 +516,13 @@ const UserManagement = () => {
                     </td>
                   </tr>
                 ))}
+                {paginatedUsers.length === 0 && (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                      No users found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -517,8 +533,28 @@ const UserManagement = () => {
           <div style={styles.pagination}>
             <div style={styles.paginationText}>Page {currentPage} of {totalPages}</div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} style={{ ...styles.paginationButton, opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}>Previous</button>
-              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} style={{ ...styles.paginationButton, opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}>Next</button>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  ...styles.paginationButton,
+                  opacity: currentPage === 1 ? 0.5 : 1,
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  ...styles.paginationButton,
+                  opacity: currentPage === totalPages ? 0.5 : 1,
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Next
+              </button>
             </div>
           </div>
         )}
@@ -531,15 +567,41 @@ const UserManagement = () => {
             <h2 style={styles.modalTitle}>Add New User</h2>
             <div style={styles.formGroup}>
               <label style={styles.label}>Full Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="Enter full name" style={styles.input} />
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter full name"
+                style={styles.input}
+              />
             </div>
             <div style={styles.formGroup}>
               <label style={styles.label}>Email Address *</label>
-              <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="Enter email address" style={styles.input} />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Enter email address"
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Leave blank for default password"
+                style={styles.input}
+              />
             </div>
             <div style={styles.formGroup}>
               <label style={styles.label}>Role</label>
-              <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})} style={styles.select}>
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                style={styles.select}
+              >
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
                 <option value="admin">Admin</option>
@@ -560,11 +622,21 @@ const UserManagement = () => {
             <h2 style={styles.modalTitle}>Edit User</h2>
             <div style={styles.formGroup}>
               <label style={styles.label}>Full Name</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} style={styles.input} />
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                style={styles.input}
+              />
             </div>
             <div style={styles.formGroup}>
               <label style={styles.label}>Email Address</label>
-              <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} style={styles.input} />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                style={styles.input}
+              />
             </div>
             <div style={styles.modalButtons}>
               <button onClick={() => setShowEditModal(false)} style={styles.cancelButton}>Cancel</button>

@@ -19,7 +19,7 @@ const FacultyManagement = () => {
     phone_extension: ''
   });
 
-  // Fetch faculty
+  // Fetch faculty from backend (users with role = 'teacher' joined with faculty table)
   const fetchFaculty = async () => {
     try {
       setLoading(true);
@@ -28,9 +28,9 @@ const FacultyManagement = () => {
         const data = await response.json();
         setFaculty(data);
       }
+      setLoading(false);
     } catch (error) {
-      console.error('Error:', error);
-    } finally {
+      console.error('Error fetching faculty:', error);
       setLoading(false);
     }
   };
@@ -59,7 +59,8 @@ const FacultyManagement = () => {
         setFormData({ name: '', email: '', department: '', designation: '', specialization: '', qualification: '', phone_extension: '' });
         fetchFaculty();
       } else {
-        alert('Failed to add faculty');
+        const error = await response.json();
+        alert(`Failed to add faculty: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       alert('Error adding faculty');
@@ -90,7 +91,7 @@ const FacultyManagement = () => {
 
   // Delete Faculty
   const deleteFaculty = async (facultyId) => {
-    if (window.confirm('Delete this faculty member?')) {
+    if (window.confirm('Delete this faculty member? This will also remove their user account.')) {
       try {
         const response = await fetch(`http://localhost:5000/api/admin/faculty/${facultyId}`, {
           method: 'DELETE'
@@ -123,7 +124,8 @@ const FacultyManagement = () => {
   // Filtering
   const filteredFaculty = faculty.filter(f => {
     const matchesSearch = f.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          f.email?.toLowerCase().includes(searchTerm.toLowerCase());
+                          f.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          f.user_id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter === 'All Departments' || f.department === departmentFilter;
     return matchesSearch && matchesDepartment;
   });
@@ -438,8 +440,8 @@ const FacultyManagement = () => {
           <div style={styles.statLabel}>Teaching Faculty</div>
         </div>
         <div style={styles.statCard}>
-          <div style={styles.statValue}>{faculty.length}</div>
-          <div style={styles.statLabel}>Total Members</div>
+          <div style={styles.statValue}>{faculty.filter(f => f.qualification).length}</div>
+          <div style={styles.statLabel}>Qualified</div>
         </div>
       </div>
 
@@ -447,7 +449,7 @@ const FacultyManagement = () => {
       <div style={styles.filters}>
         <div style={styles.searchWrapper}>
           <i className="fas fa-search" style={styles.searchIcon}></i>
-          <input type="text" placeholder="Search faculty..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={styles.searchInput} />
+          <input type="text" placeholder="Search faculty by name, email or ID..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={styles.searchInput} />
         </div>
         <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} style={styles.selectInput}>
           <option>All Departments</option>
@@ -466,6 +468,7 @@ const FacultyManagement = () => {
           <table style={styles.table}>
             <thead>
               <tr>
+                <th style={styles.th}>Faculty ID</th>
                 <th style={styles.th}>Name</th>
                 <th style={styles.th}>Email</th>
                 <th style={styles.th}>Department</th>
@@ -478,6 +481,7 @@ const FacultyManagement = () => {
             <tbody>
               {paginatedFaculty.map((f) => (
                 <tr key={f.user_id}>
+                  <td style={styles.td}>{f.user_id}</td>
                   <td style={styles.tdName}>{f.name}</td>
                   <td style={styles.td}>{f.email}</td>
                   <td style={styles.td}>{f.department || '—'}</td>
@@ -498,7 +502,9 @@ const FacultyManagement = () => {
               ))}
               {paginatedFaculty.length === 0 && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>No faculty found</td>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                    No faculty members found
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -563,18 +569,18 @@ const FacultyManagement = () => {
               </div>
               <div style={styles.formGroup}>
                 <label style={styles.formLabel}>Designation</label>
-                <input type="text" value={formData.designation} onChange={(e) => setFormData({...formData, designation: e.target.value})} placeholder="Professor" style={styles.formInput} />
+                <input type="text" value={formData.designation} onChange={(e) => setFormData({...formData, designation: e.target.value})} placeholder="Professor / Associate Professor" style={styles.formInput} />
               </div>
             </div>
             
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
                 <label style={styles.formLabel}>Specialization</label>
-                <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} placeholder="e.g., AI, Databases" style={styles.formInput} />
+                <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} placeholder="e.g., AI, Databases, Networks" style={styles.formInput} />
               </div>
               <div style={styles.formGroup}>
                 <label style={styles.formLabel}>Qualification</label>
-                <input type="text" value={formData.qualification} onChange={(e) => setFormData({...formData, qualification: e.target.value})} placeholder="Ph.D., M.S." style={styles.formInput} />
+                <input type="text" value={formData.qualification} onChange={(e) => setFormData({...formData, qualification: e.target.value})} placeholder="Ph.D., M.S., M.Sc." style={styles.formInput} />
               </div>
             </div>
             

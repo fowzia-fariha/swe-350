@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const StudentRecords = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -6,36 +6,55 @@ const StudentRecords = () => {
   const [yearFilter, setYearFilter] = useState('All Years');
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const [students] = useState([
-    { id: 'ST2023001', name: 'John Smith', department: 'Computer Science', year: '3rd', gpa: 3.8, attendance: '92%', status: 'Active' },
-    { id: 'ST2023015', name: 'Michael Brown', department: 'Information Technology', year: '2nd', gpa: 3.2, attendance: '88%', status: 'Active' },
-    { id: 'ST2023020', name: 'Emily Davis', department: 'Cyber Security', year: '4th', gpa: 3.6, attendance: '95%', status: 'Active' },
-    { id: 'ST2021008', name: 'Sarah Wilson', department: 'Computer Science', year: 'Graduated', gpa: 3.9, attendance: '98%', status: 'Graduated' },
-    { id: 'ST2023012', name: 'David Lee', department: 'Software Engineering', year: '1st', gpa: 3.0, attendance: '78%', status: 'Active' }
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState([]);
 
-  const stats = [
-    { number: '1,248', label: 'Total Students' },
-    { number: '1,120', label: 'Active Students' },
-    { number: '85%', label: 'Avg Attendance' },
-    { number: '3.42', label: 'Avg GPA' }
-  ];
+  // Fetch students from backend (users with role = 'student')
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/admin/students');
+      if (response.ok) {
+        const data = await response.json();
+        setStudents(data);
+        
+        // Extract unique departments for filter
+        const uniqueDepts = [...new Set(data.map(s => s.department).filter(Boolean))];
+        setDepartments(uniqueDepts);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   const handleAddStudent = () => {
     alert('Add Student:\n\nCreate new student record with:\n- Personal information\n- Academic details\n- Contact information\n- Emergency contacts\n- Course enrollment');
   };
 
-  const handleViewStudent = (id) => {
-    alert(`View Student: ${id}\n\nComplete student profile\nAcademic history\nAttendance records\nFinancial information\nMedical records`);
+  const handleViewStudent = (student) => {
+    alert(`📚 Student Details\n\n` +
+          `ID: ${student.user_id}\n` +
+          `Name: ${student.name}\n` +
+          `Email: ${student.email}\n` +
+          `Roll Number: ${student.roll_number || 'N/A'}\n` +
+          `Department: ${student.department || 'N/A'}\n` +
+          `Semester: ${student.semester || 'N/A'}\n` +
+          `CGPA: ${student.cgpa || 'N/A'}`);
   };
 
-  const handleEditStudent = (id) => {
-    alert(`Edit Student: ${id}\n\nEdit personal information\nUpdate academic details\nModify course enrollment\nChange contact information`);
+  const handleEditStudent = (student) => {
+    alert(`Edit Student: ${student.user_id}\n\nEdit personal information\nUpdate academic details\nModify course enrollment\nChange contact information`);
   };
 
-  const handleViewTranscript = (id) => {
-    alert(`View Transcript: ${id}\n\nComplete academic transcript\nCourse grades\nGPA calculation\nCredits earned\nDegree progress`);
+  const handleViewTranscript = (student) => {
+    alert(`Transcript for: ${student.name}\n\nComplete academic transcript\nCourse grades\nGPA calculation: ${student.cgpa || 'N/A'}\nCredits earned\nDegree progress`);
   };
 
   const handleExportRecords = () => {
@@ -52,12 +71,12 @@ const StudentRecords = () => {
 
   // Filter students
   const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          student.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          student.user_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          student.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter === 'All Departments' || student.department === departmentFilter;
-    const matchesYear = yearFilter === 'All Years' || student.year === yearFilter;
-    const matchesStatus = statusFilter === 'All Status' || student.status === statusFilter;
-    return matchesSearch && matchesDepartment && matchesYear && matchesStatus;
+    const matchesYear = yearFilter === 'All Years' || student.semester?.toString() === yearFilter;
+    return matchesSearch && matchesDepartment && matchesYear;
   });
 
   // Pagination
@@ -65,6 +84,14 @@ const StudentRecords = () => {
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
   const startIndex = (currentPage - 1) * studentsPerPage;
   const paginatedStudents = filteredStudents.slice(startIndex, startIndex + studentsPerPage);
+
+  // Stats calculations
+  const totalStudents = students.length;
+  const activeStudents = students.filter(s => s.is_active === 1).length;
+  const avgGPA = students.length > 0 
+    ? (students.reduce((sum, s) => sum + (parseFloat(s.cgpa) || 0), 0) / students.length).toFixed(2)
+    : '0.00';
+  const avgAttendance = '85%'; // Placeholder - you can calculate from attendance table
 
   const styles = {
     container: {
@@ -298,9 +325,19 @@ const StudentRecords = () => {
     }
   };
 
-  const getStatusStyle = (status) => {
-    return status === 'Active' ? styles.statusActive : styles.statusInactive;
+  const getStatusStyle = (isActive) => {
+    return isActive === 1 ? styles.statusActive : styles.statusInactive;
   };
+
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <div style={{ color: '#94a3b8' }}>Loading students...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
@@ -323,12 +360,22 @@ const StudentRecords = () => {
 
         {/* Stats Cards */}
         <div style={styles.statsGrid}>
-          {stats.map((stat, idx) => (
-            <div key={idx} style={styles.statCard}>
-              <div style={styles.statValue}>{stat.number}</div>
-              <div style={styles.statLabel}>{stat.label}</div>
-            </div>
-          ))}
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{totalStudents}</div>
+            <div style={styles.statLabel}>Total Students</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{activeStudents}</div>
+            <div style={styles.statLabel}>Active Students</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{avgAttendance}</div>
+            <div style={styles.statLabel}>Avg Attendance</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{avgGPA}</div>
+            <div style={styles.statLabel}>Avg GPA</div>
+          </div>
         </div>
 
         {/* Filters */}
@@ -337,7 +384,7 @@ const StudentRecords = () => {
             <i className="fas fa-search" style={styles.searchIcon}></i>
             <input 
               type="text" 
-              placeholder="Search students..." 
+              placeholder="Search students by name, ID or email..." 
               value={searchTerm} 
               onChange={(e) => setSearchTerm(e.target.value)} 
               style={styles.searchInput} 
@@ -349,10 +396,7 @@ const StudentRecords = () => {
             style={styles.selectInput}
           >
             <option>All Departments</option>
-            <option>Computer Science</option>
-            <option>Information Technology</option>
-            <option>Software Engineering</option>
-            <option>Cyber Security</option>
+            {departments.map(dept => <option key={dept}>{dept}</option>)}
           </select>
           <select 
             value={yearFilter} 
@@ -360,20 +404,10 @@ const StudentRecords = () => {
             style={styles.selectInput}
           >
             <option>All Years</option>
-            <option>1st</option>
-            <option>2nd</option>
-            <option>3rd</option>
-            <option>4th</option>
-            <option>Graduated</option>
-          </select>
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)} 
-            style={styles.selectInput}
-          >
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
             <option>Graduated</option>
           </select>
           <button onClick={handleClearFilters} style={styles.clearButton}>
@@ -391,43 +425,46 @@ const StudentRecords = () => {
                 <tr>
                   <th style={styles.th}>Student ID</th>
                   <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Email</th>
                   <th style={styles.th}>Department</th>
-                  <th style={styles.th}>Year</th>
-                  <th style={styles.th}>GPA</th>
-                  <th style={styles.th}>Attendance</th>
-                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Roll Number</th>
+                  <th style={styles.th}>Semester</th>
+                  <th style={styles.th}>CGPA</th>
                   <th style={styles.th}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedStudents.map((student, idx) => (
-                  <tr key={idx}>
-                    <td style={styles.td}>{student.id}</td>
+                  <tr key={student.user_id || idx}>
+                    <td style={styles.td}>{student.user_id}</td>
                     <td style={styles.tdName}>{student.name}</td>
-                    <td style={styles.td}>{student.department}</td>
-                    <td style={styles.td}>{student.year}</td>
-                    <td style={styles.td}>{student.gpa}</td>
-                    <td style={styles.td}>{student.attendance}</td>
-                    <td style={styles.td}>
-                      <span style={getStatusStyle(student.status)}>
-                        {student.status}
-                      </span>
-                    </td>
+                    <td style={styles.td}>{student.email}</td>
+                    <td style={styles.td}>{student.department || '—'}</td>
+                    <td style={styles.td}>{student.roll_number || '—'}</td>
+                    <td style={styles.td}>{student.semester || '—'}</td>
+                    <td style={styles.td}>{student.cgpa || '—'}</td>
                     <td style={styles.td}>
                       <div style={styles.actionButtons}>
-                        <button style={styles.actionBtn} onClick={() => handleViewStudent(student.id)}>
+                        <button style={styles.actionBtn} onClick={() => handleViewStudent(student)}>
                           <i className="fas fa-eye"></i>
                         </button>
-                        <button style={styles.actionBtn} onClick={() => handleEditStudent(student.id)}>
+                        <button style={styles.actionBtn} onClick={() => handleEditStudent(student)}>
                           <i className="fas fa-edit"></i>
                         </button>
-                        <button style={styles.actionBtn} onClick={() => handleViewTranscript(student.id)}>
+                        <button style={styles.actionBtn} onClick={() => handleViewTranscript(student)}>
                           <i className="fas fa-file-alt"></i>
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))}
+                {paginatedStudents.length === 0 && (
+                  <tr>
+                    <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                      No students found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

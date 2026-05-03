@@ -92,3 +92,16 @@
 // }
 
 // export default AdminDashboard;
+
+
+// pages/admin/AdminDashboard.jsx (simplified for testing)
+function AdminDashboard() {
+  return (
+    <div>
+      <h1>Admin Dashboard - Working!</h1>
+      <p>If you see this, the routing works.</p>
+    </div>
+  );
+}
+
+export default AdminDashboard;

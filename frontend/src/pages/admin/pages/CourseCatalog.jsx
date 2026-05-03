@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 const CourseCatalog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All Departments');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [semesterFilter, setSemesterFilter] = useState('All Semesters');
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch courses from database
+  // Fetch course overview from database
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/admin/courses');
+      const response = await fetch('http://localhost:5000/api/admin/course-overview');
       if (response.ok) {
         const data = await response.json();
         setCourses(data);
@@ -29,28 +29,39 @@ const CourseCatalog = () => {
 
   // Add Course
   const addCourse = async () => {
-    const courseCode = prompt('Enter Course Code (e.g., CS999):', `CS${Math.floor(Math.random() * 900) + 100}`);
+    const courseCode = prompt('Enter Course Code (e.g., CSE-101):', '');
     if (!courseCode) return;
     
-    const courseName = prompt('Enter Course Name:', 'New Course');
+    const courseName = prompt('Enter Course Name:', '');
     if (!courseName) return;
     
     const credits = parseInt(prompt('Enter Credits (3 or 4):', '3'));
-    const department = prompt('Enter Department:', departmentFilter !== 'All Departments' ? departmentFilter : 'Computer Science');
-    const description = prompt('Enter Description:', 'Course description goes here.');
+    const department = prompt('Enter Department:', 'Computer Science');
+    const semester = prompt('Enter Semester (e.g., 1st Semester, 2nd Semester):', '1st Semester');
+    const prerequisites = prompt('Enter Prerequisites (comma separated):', 'None');
+    const description = prompt('Enter Description:', '');
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/courses', {
+      const response = await fetch('http://localhost:5000/api/admin/course-overview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ course_code: courseCode, course_name: courseName, credits, department, description })
+        body: JSON.stringify({ 
+          course_code: courseCode, 
+          course_name: courseName, 
+          credits, 
+          department, 
+          semester,
+          prerequisites,
+          description 
+        })
       });
 
       if (response.ok) {
         alert(`Course ${courseCode} added successfully!`);
         fetchCourses();
       } else {
-        alert('Failed to add course');
+        const error = await response.json();
+        alert(`Failed to add course: ${error.error}`);
       }
     } catch (error) {
       alert('Error adding course');
@@ -62,17 +73,27 @@ const CourseCatalog = () => {
   };
 
   const viewCourse = (course) => {
-    alert(`Course Details\n\nCode: ${course.course_code}\nName: ${course.course_name}\nCredits: ${course.credits}\nDepartment: ${course.department}\nDescription: ${course.description || 'No description'}`);
+    alert(`📖 Course Details\n\n` +
+          `Code: ${course.course_code}\n` +
+          `Name: ${course.course_name}\n` +
+          `Credits: ${course.credits}\n` +
+          `Department: ${course.department}\n` +
+          `Semester: ${course.semester}\n` +
+          `Prerequisites: ${course.prerequisites || 'None'}\n` +
+          `Description: ${course.description || 'No description'}`);
   };
 
   const editCourse = async (course) => {
     const newName = prompt('Enter new course name:', course.course_name);
     if (newName && newName !== course.course_name) {
       try {
-        await fetch(`http://localhost:5000/api/admin/courses/${course.id}`, {
+        await fetch(`http://localhost:5000/api/admin/course-overview/${course.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ course_name: newName, credits: course.credits, department: course.department, description: course.description })
+          body: JSON.stringify({ 
+            ...course,
+            course_name: newName 
+          })
         });
         alert('Course updated successfully!');
         fetchCourses();
@@ -83,9 +104,9 @@ const CourseCatalog = () => {
   };
 
   const deleteCourse = async (course) => {
-    if (window.confirm(`Delete ${course.course_code}?`)) {
+    if (window.confirm(`Delete ${course.course_code} - ${course.course_name}?`)) {
       try {
-        await fetch(`http://localhost:5000/api/admin/courses/${course.id}`, { method: 'DELETE' });
+        await fetch(`http://localhost:5000/api/admin/course-overview/${course.id}`, { method: 'DELETE' });
         alert('Course deleted successfully!');
         fetchCourses();
       } catch (error) {
@@ -95,30 +116,43 @@ const CourseCatalog = () => {
   };
 
   const manageStudents = (course) => {
-    alert(`Manage Students for ${course.course_code}`);
+    alert(`Manage Students for ${course.course_code}\n\nView enrolled students\nAdd/remove students\nWaitlist management`);
   };
 
   const clearFilters = () => {
     setDepartmentFilter('All Departments');
+    setSemesterFilter('All Semesters');
     setSearchTerm('');
-    setCurrentPage(1);
   };
 
-  // Filtering & Pagination
+  // Filtering
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.course_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           course.course_code?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter === 'All Departments' || course.department === departmentFilter;
-    return matchesSearch && matchesDepartment;
+    const matchesSemester = semesterFilter === 'All Semesters' || course.semester === semesterFilter;
+    return matchesSearch && matchesDepartment && matchesSemester;
   });
 
-  const coursesPerPage = 6;
-  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
-  const startIndex = (currentPage - 1) * coursesPerPage;
-  const paginatedCourses = filteredCourses.slice(startIndex, startIndex + coursesPerPage);
+  // Group courses by semester
+  const groupCoursesBySemester = () => {
+    const grouped = {};
+    filteredCourses.forEach(course => {
+      const semester = course.semester || 'Uncategorized';
+      if (!grouped[semester]) {
+        grouped[semester] = [];
+      }
+      grouped[semester].push(course);
+    });
+    return grouped;
+  };
+
+  const groupedCourses = groupCoursesBySemester();
   const totalCourses = courses.length;
   const activeCourses = courses.filter(c => c.is_active === 1).length;
-  const departments = [...new Set(courses.map(c => c.department).filter(Boolean))].length;
+  const departments = [...new Set(courses.map(c => c.department).filter(Boolean))];
+  const semesters = [...new Set(courses.map(c => c.semester).filter(Boolean))];
+  const semesterOrder = ['1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester'];
 
   const styles = {
     container: {
@@ -260,11 +294,21 @@ const CourseCatalog = () => {
       fontWeight: 600,
       color: 'white'
     },
+    semesterGroup: {
+      marginBottom: '32px'
+    },
+    semesterTitle: {
+      fontSize: '20px',
+      fontWeight: 700,
+      color: '#667eea',
+      marginBottom: '16px',
+      paddingBottom: '8px',
+      borderBottom: '2px solid rgba(102,126,234,0.3)'
+    },
     courseGrid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-      gap: '20px',
-      marginTop: '20px'
+      gap: '20px'
     },
     courseCard: {
       background: 'rgba(255,255,255,0.03)',
@@ -283,12 +327,13 @@ const CourseCatalog = () => {
       fontSize: '16px',
       fontWeight: 600,
       color: 'white',
-      marginBottom: '12px'
+      marginBottom: '8px'
     },
     courseMeta: {
       display: 'flex',
       gap: '15px',
-      marginBottom: '12px'
+      marginBottom: '12px',
+      flexWrap: 'wrap'
     },
     metaItem: {
       display: 'flex',
@@ -296,6 +341,14 @@ const CourseCatalog = () => {
       gap: '6px',
       color: '#94a3b8',
       fontSize: '12px'
+    },
+    prerequisites: {
+      marginTop: '8px',
+      padding: '6px 10px',
+      background: 'rgba(102,126,234,0.1)',
+      borderRadius: '8px',
+      fontSize: '11px',
+      color: '#94a3b8'
     },
     courseDescription: {
       color: '#94a3b8',
@@ -330,44 +383,6 @@ const CourseCatalog = () => {
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center'
-    },
-    pagination: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginTop: '24px',
-      paddingTop: '16px',
-      borderTop: '1px solid rgba(255,255,255,0.05)'
-    },
-    paginationText: {
-      color: '#94a3b8',
-      fontSize: '13px'
-    },
-    paginationButtons: {
-      display: 'flex',
-      gap: '8px'
-    },
-    pageButton: {
-      padding: '8px 16px',
-      background: '#1a1a2e',
-      border: '1px solid rgba(102,126,234,0.3)',
-      borderRadius: '8px',
-      color: '#94a3b8',
-      cursor: 'pointer'
-    },
-    pageButtonDisabled: {
-      padding: '8px 16px',
-      background: '#1a1a2e',
-      border: '1px solid rgba(102,126,234,0.3)',
-      borderRadius: '8px',
-      color: '#94a3b8',
-      opacity: 0.5,
-      cursor: 'not-allowed'
-    },
-    activePageButton: {
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
-      color: 'white',
-      border: 'none'
     }
   };
 
@@ -387,7 +402,7 @@ const CourseCatalog = () => {
       <div style={styles.header}>
         <div>
           <h1 style={styles.pageTitle}>Course Catalog</h1>
-          <p style={styles.pageSubtitle}>Manage courses, syllabi, and curriculum</p>
+          <p style={styles.pageSubtitle}>Complete curriculum with semester-wise course breakdown</p>
         </div>
         <div style={styles.headerButtons}>
           <button onClick={importCourses} style={styles.importButton}>
@@ -410,12 +425,12 @@ const CourseCatalog = () => {
           <div style={styles.statLabel}>Active Courses</div>
         </div>
         <div style={styles.statCard}>
-          <div style={styles.statValue}>{departments}</div>
+          <div style={styles.statValue}>{departments.length}</div>
           <div style={styles.statLabel}>Departments</div>
         </div>
         <div style={styles.statCard}>
-          <div style={styles.statValue}>{courses.filter(c => c.credits === 3).length}</div>
-          <div style={styles.statLabel}>3 Credit Courses</div>
+          <div style={styles.statValue}>{semesters.length}</div>
+          <div style={styles.statLabel}>Semesters</div>
         </div>
       </div>
 
@@ -427,75 +442,57 @@ const CourseCatalog = () => {
         </div>
         <select value={departmentFilter} onChange={(e) => setDepartmentFilter(e.target.value)} style={styles.selectInput}>
           <option>All Departments</option>
-          <option>Computer Science</option>
-          <option>Information Technology</option>
-          <option>Software Engineering</option>
-          <option>Mathematics</option>
-          <option>Cyber Security</option>
+          {departments.map(dept => <option key={dept}>{dept}</option>)}
+        </select>
+        <select value={semesterFilter} onChange={(e) => setSemesterFilter(e.target.value)} style={styles.selectInput}>
+          <option>All Semesters</option>
+          {semesterOrder.map(sem => semesters.includes(sem) && <option key={sem}>{sem}</option>)}
         </select>
         <button onClick={clearFilters} style={styles.clearButton}>
           <i className="fas fa-filter"></i> Clear Filters
         </button>
       </div>
 
-      {/* Course Grid */}
+      {/* Course Grid Grouped by Semester */}
       <div style={styles.sectionContainer}>
         <div style={styles.sectionHeader}>
           <h2 style={styles.sectionTitle}>Course Management</h2>
         </div>
 
-        <div style={styles.courseGrid}>
-          {paginatedCourses.map((course) => (
-            <div key={course.id} style={styles.courseCard}>
-              <div style={styles.courseCode}>{course.course_code}</div>
-              <div style={styles.courseName}>{course.course_name}</div>
-              <div style={styles.courseMeta}>
-                <div style={styles.metaItem}><i className="fas fa-clock"></i> {course.credits} Credits</div>
-                <div style={styles.metaItem}><i className="fas fa-building"></i> {course.department}</div>
-              </div>
-              <div style={styles.courseDescription}>{course.description || 'No description available'}</div>
-              <div style={styles.actionButtons}>
-                <button style={styles.actionBtn} onClick={() => viewCourse(course)}><i className="fas fa-eye"></i></button>
-                <button style={styles.actionBtn} onClick={() => editCourse(course)}><i className="fas fa-edit"></i></button>
-                <button style={styles.actionBtnDelete} onClick={() => deleteCourse(course)}><i className="fas fa-trash"></i></button>
-                <button style={styles.actionBtn} onClick={() => manageStudents(course)}><i className="fas fa-users"></i></button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div style={styles.pagination}>
-            <div style={styles.paginationText}>
-              Showing {startIndex + 1} - {Math.min(startIndex + coursesPerPage, filteredCourses.length)} of {filteredCourses.length} courses
-            </div>
-            <div style={styles.paginationButtons}>
-              <button 
-                onClick={() => setCurrentPage(p => Math.max(1, p-1))} 
-                disabled={currentPage === 1}
-                style={currentPage === 1 ? styles.pageButtonDisabled : styles.pageButton}
-              >
-                Previous
-              </button>
-              {[1, 2, 3].filter(p => p <= totalPages).map(pageNum => (
-                <button 
-                  key={pageNum} 
-                  onClick={() => setCurrentPage(pageNum)} 
-                  style={currentPage === pageNum ? styles.activePageButton : styles.pageButton}
-                >
-                  {pageNum}
-                </button>
-              ))}
-              <button 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} 
-                disabled={currentPage === totalPages}
-                style={currentPage === totalPages ? styles.pageButtonDisabled : styles.pageButton}
-              >
-                Next
-              </button>
-            </div>
+        {Object.keys(groupedCourses).length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+            No courses found
           </div>
+        ) : (
+          semesterOrder.filter(sem => groupedCourses[sem]).map(semester => (
+            <div key={semester} style={styles.semesterGroup}>
+              <h3 style={styles.semesterTitle}>{semester}</h3>
+              <div style={styles.courseGrid}>
+                {groupedCourses[semester].map((course) => (
+                  <div key={course.id} style={styles.courseCard}>
+                    <div style={styles.courseCode}>{course.course_code}</div>
+                    <div style={styles.courseName}>{course.course_name}</div>
+                    <div style={styles.courseMeta}>
+                      <div style={styles.metaItem}><i className="fas fa-clock"></i> {course.credits} Credits</div>
+                      <div style={styles.metaItem}><i className="fas fa-building"></i> {course.department}</div>
+                    </div>
+                    {course.prerequisites && course.prerequisites !== 'None' && (
+                      <div style={styles.prerequisites}>
+                        <i className="fas fa-book"></i> Prerequisites: {course.prerequisites}
+                      </div>
+                    )}
+                    <div style={styles.courseDescription}>{course.description || 'No description available'}</div>
+                    <div style={styles.actionButtons}>
+                      <button style={styles.actionBtn} onClick={() => viewCourse(course)}><i className="fas fa-eye"></i></button>
+                      <button style={styles.actionBtn} onClick={() => editCourse(course)}><i className="fas fa-edit"></i></button>
+                      <button style={styles.actionBtnDelete} onClick={() => deleteCourse(course)}><i className="fas fa-trash"></i></button>
+                      <button style={styles.actionBtn} onClick={() => manageStudents(course)}><i className="fas fa-users"></i></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>
